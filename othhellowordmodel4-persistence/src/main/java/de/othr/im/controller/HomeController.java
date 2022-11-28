@@ -79,7 +79,7 @@ public class HomeController {
     	Optional<Student> friend = studentRepository.findById(id);
     	System.out.println(friend.get().getName());
 		
-	return "/lecture/lecture-add";
+	return "/friend-add";
 	}
     
    
