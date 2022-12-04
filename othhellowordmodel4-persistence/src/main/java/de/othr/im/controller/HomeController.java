@@ -1,7 +1,9 @@
 package de.othr.im.controller;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,8 +20,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import de.othr.im.model.Friend;
 import de.othr.im.model.Student;
+import de.othr.im.repository.FriendRepository;
 import de.othr.im.repository.StudentRepository;
 
 @Controller
@@ -27,6 +32,8 @@ public class HomeController {
 	
 	@Autowired
 	StudentRepository studentRepository;
+	@Autowired
+	FriendRepository friendRepository;
 
     @GetMapping("/")
     public String hello(){
@@ -69,17 +76,47 @@ public class HomeController {
     //	request.getSession().setAttribute("studentSession", student);
 		model.addAttribute("students", studentRepository
 				.findByNameContaining(friend.getName()));
+		List<Friend> friends = friendRepository.findByuserId(Long.valueOf(1));
+		System.out.print(friends);
+    	model.addAttribute("friends", friends);
 		
 	return "/friendSearch";
 	}
     
   
     @RequestMapping(value = "/addFriend/{id}")
-	public String addFriend(@PathVariable("id") Long id,  Model model, HttpServletRequest request) {
+	public ModelAndView addFriend(@PathVariable("id") Long id,  Model model, HttpServletRequest request, RedirectAttributes attributes) {
+    	if (friendRepository.findByuserIdAndFriendId(id, id)== null) {
+    		
+    		
+    		
+    	
+    	
     	Optional<Student> friend = studentRepository.findById(id);
-    	System.out.println(friend.get().getName());
-		
-	return "/friend-add";
+    	List<Friend> friends = friendRepository.findByuserId(id);
+    	model.addAttribute("friends", friends);
+    	//System.out.println(friends.get(0).getFriendId());
+    	//System.out.println(friends.get(1).getFriendId());
+   // 	System.out.println(friend.get().getName());
+    	Friend newFriend = new Friend();
+    	newFriend.setUserId(Long.valueOf(1));
+    	newFriend.setFriendId(id);
+    	System.out.print(newFriend.getFriendId());
+        friendRepository.save(newFriend);
+        
+        String msg="Erfolgreich";
+		attributes.addFlashAttribute("success", msg);
+	      //  model.addAttribute("success",msg);
+	        return new ModelAndView("redirect:/selectFriend");
+    	}else {
+    		
+    		String msg="Bereits vorhanden";
+    		attributes.addFlashAttribute("success", msg);
+    		System.out.print("Bereits vorhanden");
+    		return new ModelAndView("redirect:/selectFriend");
+    	}
+	//return "/friend-add";
+	
 	}
     
    
