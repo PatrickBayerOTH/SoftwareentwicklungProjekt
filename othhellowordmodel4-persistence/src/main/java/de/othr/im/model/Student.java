@@ -32,6 +32,7 @@ public class Student implements Serializable{
 
 	String name;
 	String email;
+	float kontostand;
 	
 //	@OneToMany(mappedBy = "student")
 //	List<Student> friends;
@@ -54,12 +55,16 @@ public class Student implements Serializable{
 	public void setEmail(String email) {
 		this.email = email;
 	}
-//	public List<Student> getFriends() {
-//		return friends;
-	//}
-//	public void setFriends(List<Student> friends) {
-//		this.friends = friends;
-//	}
+	
+	public void setKontostand(float addValue) {
+		this.kontostand = kontostand+addValue;
+	}
+	
+	public float getKontostand() {
+		return kontostand;
+	}
+	
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}

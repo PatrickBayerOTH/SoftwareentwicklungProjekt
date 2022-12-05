@@ -28,6 +28,9 @@
               <a class="nav-link" href="http://localhost:8080/friends">Freunde</a>
             </li>
               <li class="nav-item">
+              <a class="nav-link" href="http://localhost:8080/sendMoney">Senden</a>
+            </li>
+              <li class="nav-item">
               <a class="nav-link" href="http://localhost:8080/login">Logout</a>
             </li>
           </ul>
