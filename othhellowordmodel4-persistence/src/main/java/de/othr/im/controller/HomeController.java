@@ -1,97 +1,88 @@
+
 package de.othr.im.controller;
 
 
+import de.othr.im.model.StudentProfessor;
+import de.othr.im.model.User;
+import de.othr.im.repository.ManagerRepository;
+import de.othr.im.repository.StudentProfessorRepository;
+import de.othr.im.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
-
-import de.othr.im.model.Student;
-import de.othr.im.repository.StudentRepository;
-
 @Controller
 public class HomeController {
-	
-	@Autowired
-	StudentRepository studentRepository;
 
-    @GetMapping("/")
-    public String hello(){
-    	System.out.println("JOOOOOO Start");
-        return "start";
-    }
-    
-    @GetMapping("/login")
-    public String login(){
-        return "login";
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    ManagerRepository managerRepository;
+
+    @Autowired
+    StudentProfessorRepository studentProfessorRepository;
+
+
+    @RequestMapping(value = {"/home","/"})
+    public ModelAndView home(HttpServletRequest request, Principal principal) {
+
+
+        ModelAndView mv = new ModelAndView();
+        List<GrantedAuthority> authorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        String myAuthorities = authorities.toString();
+
+        System.out.println(
+                "Authorities of the logged user " + Integer.parseInt(principal.getName()) + " is/are" + " = " +
+                        myAuthorities
+        );
+
+        //searching in the database by the login....
+        Optional<User> oLoggedUser = userRepository.findUserByMatrikelnummer(Integer.parseInt(principal.getName()));
+       /*     if (myAuthorities.contains("ADMIN")) {
+
+            Optional<Manager> oManager;
+
+            oManager = managerRepository.findStudentByIdUser(oLoggedUser.get().getId());
+
+            request.getSession().setAttribute("managerSession", oManager.get());
+
+            mv.setViewName("/manager");
+        }*/
+        if (myAuthorities.contains("STUDENT")) {
+            Optional<StudentProfessor> oStudent;
+
+            oStudent = studentProfessorRepository.findStudentByIdUser(oLoggedUser.get().getId());
+            request.getSession().setAttribute("studentSession", oStudent.get());
+            mv.setViewName("/student");
+            return mv;
+
+        }
+ /*       if (myAuthorities.contains("PROFESSOR")) {
+            Optional<Professor> oProfessor;
+
+            oProfessor = professorRepository.findStudentByIdUser(oLoggedUser.get().getId());
+
+            request.getSession().setAttribute("professorSession", oProfessor.get());
+
+            mv.setViewName("/professor");
+            return mv;
+
+        }*/
+        else {
+            mv.setViewName("/error");
+
+            return mv;
+        }
     }
 
-    @GetMapping("/registration")
-    public String message(Model model) {
-       // model.addAttribute("registration");
-        return "registration";
-    }
-    
-    @GetMapping("/mainpage")
-    public String mainpage(Model model) {
-       // model.addAttribute("registration");
-        return "mainpage";
-    }
-    
-    @GetMapping("/activity")
-    public String activity(Model model) {
-       // model.addAttribute("registration");
-        return "activity";
-    }
-    @GetMapping("/friends")
-    public String friends(Model model) {
-       // model.addAttribute("registration");
-        return "friends";
-    }
-    
-    
-    @RequestMapping(value= "/selectFriend")
-	public String searchFriend(@ModelAttribute(name = "friendForm") Student friend, Model model) {
-    //	Student student = new Student();
-    //	request.getSession().setAttribute("studentSession", student);
-		model.addAttribute("students", studentRepository
-				.findByNameContaining(friend.getName()));
-		
-	return "/friendSearch";
-	}
-    
-  
-    @RequestMapping(value = "/addFriend/{id}")
-	public String addFriend(@PathVariable("id") Long id,  Model model, HttpServletRequest request) {
-    	Optional<Student> friend = studentRepository.findById(id);
-    	System.out.println(friend.get().getName());
-		
-	return "/friend-add";
-	}
-    
-   
-    
-    @GetMapping("/studentSearch")
-    public String findAll(Model model) {
-      // model.addAttribute("registration");
-    	
-    	List<Student> students = studentRepository.findAll();
-    	model.addAttribute("students", students);
-    	System.out.println(students.get(0).getName());
-        return "students-list";
-    }
-    
 }
+
