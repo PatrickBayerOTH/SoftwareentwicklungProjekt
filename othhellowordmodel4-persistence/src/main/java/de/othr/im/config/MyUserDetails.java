@@ -40,7 +40,6 @@ public class MyUserDetails implements UserDetails {
 
         authorities = new ArrayList<>();
 
-        // convert the type authority(define by me) to the type SimpleGrantedAuthority from spring security
         for (int i = 0; i < myauthorities.size(); i++) {
             authorities.add(new SimpleGrantedAuthority(myauthorities.get(i).getDescription().toUpperCase()));
             System.out.println("the profile" + i + " of " + user.getMatrikelnummer() + " is " + myauthorities.get(0).getDescription());
@@ -83,6 +82,10 @@ public class MyUserDetails implements UserDetails {
         return this.active;
     }
 
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public void setPassword(String password) {
         this.password = password;

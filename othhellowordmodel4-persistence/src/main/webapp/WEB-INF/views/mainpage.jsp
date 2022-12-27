@@ -31,7 +31,7 @@
               <a class="nav-link" href="http://localhost:8080/sendMoney">Senden</a>
             </li>
               <li class="nav-item">
-              <a class="nav-link" href="http://localhost:8080/login">Logout</a>
+              <a class="nav-link" href="/prelogout">Logout</a>
             </li>
           </ul>
          

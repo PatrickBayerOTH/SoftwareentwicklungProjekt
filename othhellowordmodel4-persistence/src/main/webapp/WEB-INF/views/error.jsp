@@ -11,19 +11,23 @@
     <meta charset="ISO-8859-1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-    <title>Home MANAGER</title>
+    <title>ERROR</title>
 
 </head>
 <body>
 
-<div class="alert alert-success" role="alert">
-    <h4 class="mt-1 mb-2 pb-1">Profile MANAGER - ${managerSession.name}</h4>
+<hr>
+
+<div class="alert alert-danger" role="alert">
+   Error
 </div>
 <br>
-<h4 class="mt-1 mb-5 pb-1">
-    Welcome,<%=request.getRemoteUser()%> ! | <a href="/prelogout"> Logout</a>
-</h4>
+<div>
+    <button type="button" class="alert alert-primary"><a href="/home">Home</a></button>
+</div>
+
 
 </body>
+
 
 </html>

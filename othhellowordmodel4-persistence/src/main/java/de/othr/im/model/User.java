@@ -5,7 +5,6 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 
@@ -24,7 +23,7 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    @Size(min = 4, message = "nachname must contain at least 4 characters!")
+    @Size(min = 4, message = "Nachname must contain at least 4 characters!")
     private String nachname;
 
     @Column(nullable = false)
@@ -41,7 +40,6 @@ public class User {
     private Integer active;
 
 
-
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(
             name = "userauthority",
@@ -49,7 +47,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "idauthority")
     )
     private List<Authority> myauthorities = new ArrayList<Authority>();
-
 
     public List<Authority> getMyauthorities() {
         return myauthorities;
@@ -122,4 +119,5 @@ public class User {
     public void setType(String type) {
         this.type = type;
     }
+
 }

@@ -15,16 +15,18 @@
 </head>
 <body>
 
-
+<br>
 <form:form method="POST" modelAttribute="studentForm" action="/studentProfessor/update/process">
-
+    <br>
     <form:hidden path="id" cssClass="form-control"/>
+    <br>
+    <label for="user.password">Password</label>
+    <form:input path="user.password" id="user.password" cssClass="form-control"/>
 
-    <label for="name">name</label>
-    <form:input path="name" cssClass="form-control"/>
-
+    <br>
     <label for="email">email</label>
     <form:input path="email" cssClass="form-control"/>
+    <br>
 
     <input type="submit" value="Update" class="btn">
 

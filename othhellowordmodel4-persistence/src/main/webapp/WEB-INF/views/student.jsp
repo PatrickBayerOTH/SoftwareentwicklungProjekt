@@ -11,43 +11,51 @@
     <meta charset="ISO-8859-1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-    <title>Home ALUNO</title>
+    <title>Home STUDENT</title>
 
 </head>
 <body>
 <!-- Main Navigation -->
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">Navbar</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/">Home</a>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="#">UniPay</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="http://localhost:8080/mainpage">&Uuml;bersicht </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="http://localhost:8080/activity">Aktivit&auml;ten</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="http://localhost:8080/friends">Freunde</a>
+            </li>
+            <div forEach var="students" items="${student}">
+                <li>
+                    <a class="nav-link" href="/student/update/students.id">Update</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="verwalten/update/{id}">Update</a>
-                </li>
-            </ul>
-        </div>
+            </div>
+            <li class="nav-item">
+                <a class="nav-link" href="/prelogout">Logout</a>
+            </li>
+        </ul>
     </div>
 </nav>
 
-<hr>
+<br><br><br><br>
 
 <div class="alert alert-success" role="alert">
-    Profile STUDENT - ${studentSession.user.name}
+    <h4 class="mt-1 mb-2 pb-1">Profile STUDENT - ${studentSession.user.name}</h4>
 </div>
-
-<hr>
-Welcome,<%=request.getRemoteUser()%> ! | <a href="/prelogout"> Logout</a>
-
-<hr>
 <br>
+<h4 class="mt-1 mb-5 pb-1">
+    Welcome,<%=request.getRemoteUser()%> ! | <a href="/prelogout"> Logout</a>
+</h4>
+
 </body>
 
 

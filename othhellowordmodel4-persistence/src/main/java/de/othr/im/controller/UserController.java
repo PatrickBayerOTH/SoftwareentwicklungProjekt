@@ -14,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +51,7 @@ public class UserController {
     @RequestMapping("/student/add/process")
     public ModelAndView addStudentProcess(@ModelAttribute("neuStudent")
                                           StudentProfessor studentProfessor,
-                                          BindingResult bindingResult, RedirectAttributes redirectAttributes
+                                          BindingResult bindingResult
     ) {
 
         ModelAndView mv = new ModelAndView();
@@ -93,8 +92,9 @@ public class UserController {
             mv.setViewName("redirect:/user/student/add");
             return mv;
         }
+        User user = studentProfessor.getUser();
 
-        Optional<User> userDB = userRepository.findUserByMatrikelnummer(studentProfessor.getUser().getMatrikelnummer());
+        Optional<User> userDB = userRepository.findUserByMatrikelnummer(user.getMatrikelnummer());
 
         if (userDB.isPresent()) {
             System.out.println("User already exists!");
@@ -106,27 +106,17 @@ public class UserController {
         }
 
 
-        User user = studentProfessor.getUser();
-
-        //TODO: Warum schlägt immer fehler mit myauthorities
-
-/*
-
         List<Authority> myauthorities = new ArrayList<Authority>();
-        //I could get this value from the view
-
         myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
-
         user.setMyauthorities(myauthorities);
-*/
-
 
         user.setActive(1);
-        user = userRepository.save(user);
+        userRepository.save(user);
 
         studentProfessor.setMatrikelnummer(user.getMatrikelnummer());
         studentProfessor.setUser(user);
         studentProfessorRepository.save(studentProfessor);
+
 
         mv.addObject("name", studentProfessor.getUser().getName());
         mv.addObject("email", studentProfessor.getUser().getEmail());
@@ -137,11 +127,10 @@ public class UserController {
 
     //TODO: NAME ODER PASSWORD UPDATE
     @RequestMapping(value = "/update/{id}")
-    public ModelAndView edit(@PathVariable("id") Long iduser, Model model) {
+    public ModelAndView edit(@PathVariable("id") Long iduser) {
 
         ModelAndView mv = new ModelAndView();
 
-        mv.setViewName("/student");
 
         Optional<Manager> oManager;
 
@@ -149,20 +138,22 @@ public class UserController {
         if (oManager.isPresent()) {
             mv.setViewName("/user/user-manager-update");
             mv.addObject("managerForm", oManager.get());
-            System.out.println("Updating the manager LOGIN " + oManager.get().getUser().getMatrikelnummer());
             return mv;
         }
 
         Optional<StudentProfessor> oStudent;
         oStudent = studentProfessorRepository.findStudentByIdUser(iduser);
         if (oStudent.isPresent()) {
-            mv.setViewName("/user/user-student-update");
+
+            mv.setViewName("/user/student-update");
             mv.addObject("studentForm", oStudent.get());
-            System.out.println("Updating the student LOGIN " + oStudent.get().getUser().getMatrikelnummer());
+            return mv;
+        } else {
+
+            mv.setViewName("/home");
             return mv;
         }
 
-        return mv;
     }
 
     @RequestMapping(value = "/update/process", method = RequestMethod.POST)

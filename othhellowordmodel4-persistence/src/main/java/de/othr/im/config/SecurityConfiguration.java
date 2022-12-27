@@ -29,13 +29,12 @@ public class SecurityConfiguration {
         http.csrf().disable();
 
         http.authorizeRequests()
-                .antMatchers("/home").permitAll() //all users can access this page
                 .antMatchers("/login").permitAll() //all users can access this page
                 .antMatchers("/user/student/add").permitAll()
                 .antMatchers("/user/student/add/process").permitAll()
                 //more permissions here....
-                .antMatchers("/admin/**", "/users/**", "/settings/**").hasAuthority("ADMIN")
-                .antMatchers("/studentProfessor/**", "/settings/**").hasAuthority("STUDENT")
+                .antMatchers("/admin/**","/settings/**").hasAuthority("ADMIN")
+                .antMatchers("/student/**", "/settings/**").hasAuthority("STUDENT")
                 //.antMatchers("/professor/**", "/settings/**").hasAuthority("PROFESSOR")
 
 
@@ -43,8 +42,7 @@ public class SecurityConfiguration {
                 .and().formLogin()
                 .loginPage("/login")
                 .permitAll()
-                .and().antMatcher("user/student/add")
-                .antMatcher("user/student/add/process")
+                .and()
                 .logout().logoutSuccessUrl("/prelogout")
                 .invalidateHttpSession(true)
 

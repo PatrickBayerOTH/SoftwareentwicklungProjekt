@@ -80,7 +80,8 @@
             <br>
 
             <button type="submit" class="btn btn-primary">Create user</button>
-            <button type="reset" class="btn btn-primary" herf="/login">Reset</button>
+
+            <button type="reset" class="btn btn-primary">Reset</button>
             <br>
             <br>
         </div>
