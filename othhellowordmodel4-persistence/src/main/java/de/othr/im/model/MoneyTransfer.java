@@ -23,8 +23,11 @@ public class MoneyTransfer{// implements Serializable{
 	@GeneratedValue (strategy = GenerationType.IDENTITY)
 	Long id;
 	
+	@Column(name="`from`")
 	int from;
+	@Column(name="`to`")
 	int to;
+	
 	float amount;
 	Timestamp date;
 
@@ -54,7 +57,7 @@ public class MoneyTransfer{// implements Serializable{
 	public Timestamp getDate() {
 		return date;
 	}
-	public void setDatetime( Timestamp date) {
+	public void setDate( Timestamp date) {
 		this.date=date;
 	}
 	

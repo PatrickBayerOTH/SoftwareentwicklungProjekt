@@ -233,7 +233,7 @@ public class HomeController {
 				targetStudent.setKontostand(transfer.getAmount());
 				transfer.setTo(Math.toIntExact(targetStudent.getId()));
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-				transfer.setDatetime(timestamp);
+				transfer.setDate(timestamp);
 
 				transferRepository.save(transfer);
 				studentRepository.save(targetStudent);
