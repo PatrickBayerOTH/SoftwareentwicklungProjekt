@@ -14,7 +14,13 @@
     Are you sure you want to leave?
 </div>
 
-<button type="button" class="btn btn-warning"><a href="<c:url value="/login"/>">Logout</a></button>
+<div>
+    <button type="button" class="alert alert-warning"><a href="/login">Logout</a></button>
+</div>
+<br>
+<div>
+<button type="button" class="alert alert-primary"><a href="/home">Home</a></button>
+</div>
 
 </body>
 </html>

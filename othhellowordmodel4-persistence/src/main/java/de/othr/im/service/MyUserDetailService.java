@@ -21,10 +21,12 @@ public class MyUserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // TODO Auto-generated method stub
 
+        Integer user = Integer.parseInt(username);
 
-        Optional<User> oUser = userRepository.findUserByMatrikelnummer(Integer.parseInt(username));
+        Optional<User> oUser = userRepository.findUserByMatrikelnummer(user);
         oUser.orElseThrow(() -> new UsernameNotFoundException("Not found" + username));
         System.out.println("User found at the UserDetailService = " + oUser.get().getEmail());
+
 
         return new MyUserDetails(oUser.get());
     }

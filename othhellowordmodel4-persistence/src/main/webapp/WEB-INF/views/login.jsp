@@ -13,44 +13,25 @@
           integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
 </head>
 
-<form action="${loginUrl}" method="post">
-    <div class="vh-100 d-flex justify-content-center align-items-center">
-        <div class="container">
-            <div class="row d-flex justify-content-center">
-                <div class="col-12 col-md-8 col-lg-6">
-                    <div class="card bg-white">
-                        <div class="card-body p-5">
-                            <form class="mb-3 mt-md-4">
-                                <h2 class="fw-bold mb-2 text-uppercase ">Login</h2>
-                                <p class=" mb-5">Please enter your Matrikelnummer and password!</p>
-                                <div class="mb-3">
-                                    <label for="user.username" class="form-label ">Matrikelnummer</label>
-                                    <input type="text" class="form-control" id="user.username" name="user.username"
-                                           placeholder="Matrikelnummer">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="user.password" class="form-label ">Password</label>
-                                    <input type="password" class="form-control" id="user.password" name="user.password"
-                                           placeholder="*******">
-                                </div>
-                                <p class="small"><a class="text-primary" href="forget-password.html">Forgot
-                                    password?</a></p>
-                                <div class="d-grid">
-                                    <button class="btn btn-outline-dark" type="submit"><a href="/home"></a>Login
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+<body>
+<form action="${loginUrl}" method="post" class="h-100 gradient-form" style="background-color: #eee;">
+    <br><br>
+    <h4 class="mt-1 mb-5 pb-1">We are The Lotus Team</h4>
 
-                        <div>
-                            <p class="mb-0  text-center">Don't have an account? <a href="user/student/add" class="text-primary fw-bold">Sign Up </a></p>
-                        </div>
-
-
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="mb-3">
+        <p>
+            <label for="username" class="form-label ">Matrikelnummer</label>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Matrikelnummer"/>
+            <small id="emailHelp" class="form-text text-muted">We'll never share your Matrikelnummer with anyone
+                else.</small>
+        </p>
     </div>
+    <p>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="*****"/>
+    </p>
+
+    <button type="submit" class="btn btn-primary">Log in</button>
 </form>
 
+</body>
