@@ -121,6 +121,20 @@
 
                             <c:forEach var="transaction" items="${transactions}" varStatus="status">
                                 <tr>
+                                    <td>
+                                        <c:if test="${directions[status.index] eq '0'}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill=#00ff00 class="bi bi-arrow-down-left" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M2 13.5a.5.5 0 0 0 .5.5h6a.5.5 0 0 0 0-1H3.707L13.854 2.854a.5.5 0 0 0-.708-.708L3 12.293V7.5a.5.5 0 0 0-1 0v6z" />
+                                            </svg>
+
+                                        </c:if>
+                                        <c:if test="${directions[status.index] ne '0'}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill=#ff0000 class="bi bi-arrow-down-right" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M14 13.5a.5.5 0 0 1-.5.5h-6a.5.5 0 0 1 0-1h4.793L2.146 2.854a.5.5 0 1 1 .708-.708L13 12.293V7.5a.5.5 0 0 1 1 0v6z" />
+                                            </svg>
+
+                                        </c:if>
+                                    </td>
 
                                     <td>${recStuds[status.index].name}
 
@@ -166,6 +180,85 @@
     </c:if>
 
     <c:if test="${targetfriend eq 'notargetfriend'}">
+        <c:if test="${targetfriend eq 'notargetfriend'}">
+
+
+            <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
+                <c:if test="${not empty transactions}">
+                    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
+                        <div class="text-center mt-5">
+                            <h5>Deine Transaktionen:</h5>
+                        </div>
+
+                        <div class="table-responsive-md mt-3">
+                            <table class="table table-striped table-hover display">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Id</th>
+
+                                    </tr>
+                                </thead>
+
+                                <c:forEach var="transaction" items="${transactions}" varStatus="status">
+                                    <tr>
+                                        <td>
+                                            <c:if test="${directions[status.index] eq '0'}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill=#00ff00 class="bi bi-arrow-down-left" viewBox="0 0 16 16">
+                                                    <path fill-rule="evenodd" d="M2 13.5a.5.5 0 0 0 .5.5h6a.5.5 0 0 0 0-1H3.707L13.854 2.854a.5.5 0 0 0-.708-.708L3 12.293V7.5a.5.5 0 0 0-1 0v6z" />
+                                                </svg>
+
+                                            </c:if>
+                                            <c:if test="${directions[status.index] ne '0'}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill=#ff0000 class="bi bi-arrow-down-right" viewBox="0 0 16 16">
+                                                    <path fill-rule="evenodd" d="M14 13.5a.5.5 0 0 1-.5.5h-6a.5.5 0 0 1 0-1h4.793L2.146 2.854a.5.5 0 1 1 .708-.708L13 12.293V7.5a.5.5 0 0 1 1 0v6z" />
+                                                </svg>
+
+                                            </c:if>
+                                        </td>
+
+                                        <td>${recStuds[status.index].name}
+
+
+                                        </td>
+                                        <td>${transaction.amount}
+
+
+                                        </td>
+                                        <td class="text-center ">
+
+
+
+                                    </tr>
+                                </c:forEach>
+
+
+                            </table>
+                        </div>
+                        <div class="product-device shadow-sm d-none d-md-block"></div>
+                        <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
+                    </div>
+
+
+
+
+                </c:if>
+                <c:if test="${empty transactions}">
+                    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
+                        <div class="text-center mt-5">
+                            <h5>Du hast noch niemandem Geld gesendet </h5>
+                        </div>
+                        <div class="product-device shadow-sm d-none d-md-block"></div>
+                        <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
+                    </div>
+
+
+                </c:if>
+            </div>
+
+
+
+        </c:if>
+
         <c:if test="${not empty currfriends}">
 
             <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
