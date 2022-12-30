@@ -64,7 +64,7 @@
             <div class="form-group row">
                 <label class="col-4 col-form-label" for="user.password">Password: </label>
                 <div class="col-8">
-                    <form:input path="user.password" type="text" id="user.password" class="form-control"></form:input>
+                    <form:input path="user.password" id="user.password" class="form-control" type="password"></form:input>
                     <form:errors path="user.password"></form:errors>
                 </div>
             </div>

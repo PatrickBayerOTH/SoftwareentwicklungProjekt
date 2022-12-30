@@ -6,7 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import de.othr.im.model.Friend;
 import de.othr.im.model.Student;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface FriendRepository extends JpaRepository<Friend, Long> {
 	
 	List<Friend> findByuserId(Long userid);

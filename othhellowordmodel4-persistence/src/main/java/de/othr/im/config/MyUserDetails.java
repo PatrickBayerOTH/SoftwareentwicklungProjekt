@@ -20,7 +20,6 @@ public class MyUserDetails implements UserDetails {
     private String password;
     private boolean active;
 
-    // gleiche Role, soll admin sein, student, Professor
     private List<GrantedAuthority> authorities;
 
     public MyUserDetails(User user) {
@@ -32,6 +31,7 @@ public class MyUserDetails implements UserDetails {
         System.out.println("password of the user is=" + this.password);
         System.out.println("matrikelnummer of the user is=" + this.username);
         this.active = (user.getActive() > 0) ? true : false;
+
 
         List<Authority> myauthorities = (List<Authority>) user.getMyauthorities();
 
@@ -51,6 +51,7 @@ public class MyUserDetails implements UserDetails {
         // TODO Auto-generated method stub
         return this.authorities;
     }
+
 
     @Override
     public String getPassword() {
@@ -83,6 +84,7 @@ public class MyUserDetails implements UserDetails {
     }
 
 
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -106,4 +108,5 @@ public class MyUserDetails implements UserDetails {
     public void setAuthorities(List<GrantedAuthority> authorities) {
         this.authorities = authorities;
     }
+
 }

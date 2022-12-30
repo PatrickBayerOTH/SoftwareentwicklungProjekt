@@ -18,6 +18,7 @@
     <button type="button" class="alert alert-warning"><a href="/login">Logout</a></button>
 </div>
 <br>
+
 <div>
 <button type="button" class="alert alert-primary"><a href="/home">Home</a></button>
 </div>

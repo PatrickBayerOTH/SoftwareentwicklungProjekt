@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
          pageEncoding="ISO-8859-1" %>
 
+
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
@@ -10,14 +11,14 @@
     <meta charset="ISO-8859-1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-    <title>List of Daten</title>
+    <title>Home STUDENT</title>
 
 </head>
 <body>
 <!-- Main Navigation -->
 
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-    <a class="navbar-brand" href="/home">UniPay</a>
+    <a class="navbar-brand" href="#">UniPay</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
             aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -39,42 +40,24 @@
         </ul>
     </div>
 </nav>
-
-<br><br><br>
-<div class="alert alert-success" role="alert">
-    <h4 class="mt-1 mb-2 pb-1">Aktuelle Daten von Profile- ${studentSession.user.name}</h4>
-</div>
-<br>
-<br><br>
-<table class="table"  border="2" width="70%" cellpadding="2">
-
-    <tr>
-        <th scope="col">Email</th>
-        <th scope="col">matrikelnummer</th>
-        <th scope="col">Nachname</th>
-        <th scope="col">Name</th>
-        <th scope="col">Type</th>
-    </tr>
-
-        <tr>
-            <td>${studentSession.user.email}</td>
-            <td>${studentSession.user.matrikelnummer}</td>
-            <td>${studentSession.user.nachname}</td>
-            <td>${studentSession.user.name}</td>
-            <td>${studentSession.user.type}</td>
-        </tr>
-
-</table>
-<br><br>
+<br><br><br><br>
 
 <div>
-    <button type="button" class="alert alert-primary"><a href="/user/update/${studentSession.user.id}">Daten
-        Aktualisieren</a>
+    <h4 class="alert alert-danger"> möchten Sie Ihr Account löschen ?
+    </h4>
+</div>
+<br><br>
+<div>
+    <button type="button" class="alert alert-danger"><a href="/user/delete/${studentSession.user.id}">Account
+        Löschen</a>
     </button>
+</div>
+
+<br>
+<div>
+    <button type="button" class="alert alert-primary"><a href="/home">Home</a></button>
 </div>
 
 
 </body>
-
-
 </html>

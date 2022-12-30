@@ -10,6 +10,7 @@ public class Authority {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false,updatable = false)
     private String description;
 
     public Authority(Long authority) {

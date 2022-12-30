@@ -15,10 +15,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private Integer matrikelnummer;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     @Email(message = "Please, inform a valid E-Mail!")
     private String email;
 
@@ -34,11 +34,10 @@ public class User {
     @Size(min = 6, message = "Password must contain at least 6 characters!")
     private String password;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private String type;
 
     private Integer active;
-
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(

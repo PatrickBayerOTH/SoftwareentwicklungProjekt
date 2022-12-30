@@ -18,7 +18,7 @@
 <!-- Main Navigation -->
 
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-    <a class="navbar-brand" href="#">UniPay</a>
+    <a class="navbar-brand" href="/home">UniPay</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
             aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -34,11 +34,6 @@
             <li class="nav-item">
                 <a class="nav-link" href="http://localhost:8080/friends">Freunde</a>
             </li>
-            <div forEach var="students" items="${student}">
-                <li>
-                    <a class="nav-link" href="/student/update/students.id">Update</a>
-                </li>
-            </div>
             <li class="nav-item">
                 <a class="nav-link" href="/prelogout">Logout</a>
             </li>
@@ -56,7 +51,20 @@
     Welcome,<%=request.getRemoteUser()%> ! | <a href="/prelogout"> Logout</a>
 </h4>
 
+
+<div>
+    <button type="button" class="alert alert-primary"><a href="user/all/${studentSession.user.id}">Daten
+        Aktualisieren</a>
+    </button>
+</div>
+
+<div>
+
+    <button type="button" class="alert alert-danger"><a href="/user/student/delete">Account
+        Löschen</a>
+    </button>
+</div>
+
+
 </body>
-
-
 </html>

@@ -14,7 +14,7 @@ public class StudentProfessor implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private Integer matrikelnummer;
 
     private double kontostand;

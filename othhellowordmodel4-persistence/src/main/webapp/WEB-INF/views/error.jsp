@@ -19,13 +19,23 @@
 <hr>
 
 <div class="alert alert-danger" role="alert">
-   Error
+    Error
 </div>
+
+
+<div>
+    ${errors}
+</div>
+
+
 <br>
 <div>
     <button type="button" class="alert alert-primary"><a href="/home">Home</a></button>
 </div>
-
+<br>
+<div>
+    <button type="button" class="alert alert-primary"><a href="/login">Login</a></button>
+</div>
 
 </body>
 

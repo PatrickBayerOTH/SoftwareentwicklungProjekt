@@ -16,7 +16,7 @@
 <body>
 <form action="${loginUrl}" method="post" class="h-100 gradient-form" style="background-color: #eee;">
     <br><br>
-    <h4 class="mt-1 mb-5 pb-1">We are The Lotus Team</h4>
+    <h4 class="mt-1 mb-5 pb-1">We are The UniPay Team</h4>
 
     <div class="mb-3">
         <p>
@@ -32,6 +32,10 @@
     </p>
 
     <button type="submit" class="btn btn-primary">Log in</button>
+
+    <div class="text-center">
+        <p>Not a member? <a href="user/student/add">Sign Up</a></p>
+    </div>
 </form>
 
 </body>
