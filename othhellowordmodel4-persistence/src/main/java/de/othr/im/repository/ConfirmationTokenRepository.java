@@ -1,3 +1,4 @@
+/*
 package de.othr.im.repository;
 
 import de.othr.im.model.ConfirmationToken;
@@ -10,3 +11,4 @@ public interface ConfirmationTokenRepository extends CrudRepository<Confirmation
 
     ConfirmationToken findByConfirmationToken(String confirmationToken);
 }
+*/

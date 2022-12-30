@@ -1,3 +1,4 @@
+/*
 package de.othr.im.model;
 
 import java.util.Date;
@@ -19,9 +20,11 @@ public class ConfirmationToken {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
 
+*/
 /*    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "iduser", referencedColumnName = "tokenid")
-    private User user;*/
+    private User user;*//*
+
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "iduser", referencedColumnName = "id")
@@ -68,3 +71,4 @@ public class ConfirmationToken {
         this.user = user;
     }
 }
+*/

@@ -43,8 +43,8 @@ public class UserController {
 /*    @Autowired
     UserEmailConfirmationRepository userEmailConfirmationRepository;*/
 
-    @Autowired
-    ConfirmationTokenRepository confirmationTokenRepository;
+/*    @Autowired
+    ConfirmationTokenRepository confirmationTokenRepository;*/
 
 
     @RequestMapping(value = "/student/add", method = RequestMethod.GET)

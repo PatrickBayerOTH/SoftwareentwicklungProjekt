@@ -27,11 +27,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+
 @Controller
 public class HomeController {
+	
+	
+	 @Autowired
+	 private JavaMailSender javaMailSender;
 
 
     @Autowired
@@ -44,8 +53,8 @@ public class HomeController {
     @Autowired
     StudentProfessorRepository studentProfessorRepository;
 
-    @Autowired
-    StudentRepository studentRepository;
+   // @Autowired
+   // StudentRepository studentRepository;
     @Autowired
     FriendRepository friendRepository;
     @Autowired
@@ -104,18 +113,30 @@ public class HomeController {
     }
 
     @RequestMapping("/friends")
-    public String friends(Model model) {
-        // model.addAttribute("registration");
+    
+    public String friends(Model model, HttpServletRequest request) {
+        
+    	
+    	//Current User
+    	StudentProfessor curUser = (StudentProfessor)request.getSession().getAttribute("studentSession");
+    	System.out.println(curUser.getKontostand());
 
-        List<Friend> currFriends = friendRepository.findByuserId(Long.valueOf(1));
-
-        List<Student> studFriends = new ArrayList<Student>();
+        List<Friend> currFriends = friendRepository.findByuserId(Long.valueOf(curUser.getUser().getId()));//1
+        if (currFriends.isEmpty()) {
+        	currFriends = friendRepository.findByfriendId(Long.valueOf(curUser.getUser().getId()));
+        }
+        //List<Student> studFriends = new ArrayList<Student>();
+        List<User> studFriends = new ArrayList<User>();
         {
         }
         ;
         for (Friend f : currFriends) {
-            Optional<Student> studF = studentRepository.findById(f.getFriendId());
-            Student actStud = new Student();
+        	
+            //Optional<Student> studF = studentRepository.findById(f.getFriendId());
+        	Optional<User> studF = userRepository.findById(f.getFriendId());
+        	
+            //Student actStud = new Student();
+        	User actStud = new User();
             if (studF.isPresent()) {
                 // value is present inside Optional
                 actStud = studF.get();
@@ -124,33 +145,50 @@ public class HomeController {
             studFriends.add(actStud);
 
         }
-        for (Student s : studFriends) {
+       /* for (Student s : studFriends) {
             System.out.print(s.getName());
 
-        }
+        }*/
 
-        // System.out.print(currFriends);
+       /*  for (StudentProfessor s : studFriends) {
+             System.out.print(s.getUser().getName());
 
-        // System.out.print(currFriends);
+         }
+        */
+        
+
+        
         model.addAttribute("currfriends", currFriends);
         model.addAttribute("studfriends", studFriends);
         return "/friends";
     }
 
     @RequestMapping(value = "/selectFriend")
-    public String searchFriend(@ModelAttribute(name = "friendForm") Student friend, Model model) {
-        // Student student = new Student();
-        // request.getSession().setAttribute("studentSession", student);
-        model.addAttribute("students", studentRepository.findByNameContaining(friend.getName()));
-        List<Friend> friends = friendRepository.findByuserId(Long.valueOf(1));
+    public String searchFriend(@ModelAttribute(name = "friendForm") User friend, Model model, HttpServletRequest request) {
+        
+    	StudentProfessor curUser = (StudentProfessor)request.getSession().getAttribute("studentSession");
+    	
+    	
+        //model.addAttribute("students", studentRepository.findByNameContaining(friend.getName()));
+    	model.addAttribute("students", userRepository.findByNameContaining(friend.getName()));
+    	
+        List<Friend> friends = friendRepository.findByuserId(Long.valueOf(curUser.getUser().getId()));
 
-        List<Student> studFriends = new ArrayList<Student>();
+        if (friends.isEmpty()) {
+        	friends = friendRepository.findByfriendId(Long.valueOf(curUser.getUser().getId()));
+        }
+        
+        //List<Student> studFriends = new ArrayList<Student>();
+        List<User> studFriends = new ArrayList<User>();
         {
         }
         ;
         for (Friend f : friends) {
-            Optional<Student> studF = studentRepository.findById(f.getFriendId());
-            Student actStud = new Student();
+        	
+            //Optional<Student> studF = studentRepository.findById(f.getFriendId());
+        	Optional<User> studF = userRepository.findById(f.getFriendId());
+            //Student actStud = new Student();
+        	User actStud = new User();
             if (studF.isPresent()) {
                 // value is present inside Optional
                 actStud = studF.get();
@@ -159,12 +197,7 @@ public class HomeController {
             studFriends.add(actStud);
 
         }
-        // for (Student s : studFriends) {
-        // System.out.print(s.getName());
 
-        // }
-
-        // System.out.print(friends);
 
         model.addAttribute("friends", friends);
         model.addAttribute("studfriends", studFriends);
@@ -175,19 +208,46 @@ public class HomeController {
     @RequestMapping(value = "/addFriend/{id}")
     public ModelAndView addFriend(@PathVariable("id") Long id, Model model, HttpServletRequest request,
                                   RedirectAttributes attributes) {
-        if (friendRepository.findByuserIdAndFriendId(id, id) == null) {
+    	
+    	StudentProfessor curUser = (StudentProfessor)request.getSession().getAttribute("studentSession");
+    	
+        if (friendRepository.findByuserIdAndFriendId(curUser.getUser().getId(), id) == null && id != curUser.getUser().getId()) {
 
-            Optional<Student> friend = studentRepository.findById(id);
-            List<Friend> friends = friendRepository.findByuserId(id);
+            //Optional<Student> friend = studentRepository.findById(id);
+        	
+        	Optional<StudentProfessor> friend = studentProfessorRepository.findStudentByIdUser(id);//studentProfessorRepository.findById(id);
+        	System.out.println(id);
+            List<Friend> friends = friendRepository.findByuserId(curUser.getUser().getId());
+            if (friends.isEmpty()) {
+            	friends = friendRepository.findByfriendId(Long.valueOf(curUser.getUser().getId()));
+            }
+            
             model.addAttribute("friends", friends);
             // System.out.println(friends.get(0).getFriendId());
             // System.out.println(friends.get(1).getFriendId());
             // System.out.println(friend.get().getName());
             Friend newFriend = new Friend();
-            newFriend.setUserId(Long.valueOf(1));
+            newFriend.setUserId(Long.valueOf(curUser.getUser().getId()));
             newFriend.setFriendId(id);
             // System.out.print(newFriend.getFriendId());
             friendRepository.save(newFriend);
+            
+            
+            Friend newFriendReverse = new Friend();
+            newFriendReverse.setFriendId(Long.valueOf(curUser.getUser().getId()));
+            newFriendReverse.setUserId(id);
+            // System.out.print(newFriend.getFriendId());
+            friendRepository.save(newFriendReverse);
+            
+            
+            SimpleMailMessage msgAddFriend = new SimpleMailMessage();
+            msgAddFriend.setTo(curUser.getUser().getEmail());
+           // System.out.println(friend.get().getUser().getName());
+            msgAddFriend.setSubject( "UniPays INFO: Sie haben einen Freund hinzugefügt");
+            msgAddFriend.setText("Sie haben "+friend.get().getUser().getNachname()+" " +friend.get().getUser().getNachname()+"als Freund hinzugefügt");
+           
+            javaMailSender.send(msgAddFriend);
+            
 
             String msg = "Erfolgreich";
             attributes.addFlashAttribute("success", msg);
@@ -207,8 +267,26 @@ public class HomeController {
     @RequestMapping(value = "/removeFriend/{id}")
     public ModelAndView removeFriend(@PathVariable("id") Long id, Model model, HttpServletRequest request,
                                      RedirectAttributes attributes) {
-        long deletedFriends = friendRepository.deleteByuserIdAndFriendId(Long.valueOf(1), id);
+    	
+    	
+    	StudentProfessor curUser = (StudentProfessor)request.getSession().getAttribute("studentSession");
 
+    	//sendEmail();
+    	
+        long deletedFriends = friendRepository.deleteByuserIdAndFriendId(Long.valueOf(curUser.getUser().getId()), id);
+        
+        long deletedFriendsS = friendRepository.deleteByFriendIdAndUserId(Long.valueOf(curUser.getUser().getId()),id);
+        
+        Optional<StudentProfessor> friend = studentProfessorRepository.findStudentByIdUser(id);
+        
+        SimpleMailMessage msgRemoveFriend = new SimpleMailMessage();
+        msgRemoveFriend.setTo(curUser.getUser().getEmail());
+       // System.out.println(friend.get().getUser().getName());
+        msgRemoveFriend.setSubject( "UniPays INFO: Sie haben einen Freund entfernt");
+        msgRemoveFriend.setText("Sie haben "+friend.get().getUser().getNachname()+" " +friend.get().getUser().getNachname()+"als Freund entfernt");
+       
+        javaMailSender.send(msgRemoveFriend);
+        
         String msg = "Freund entfernt";
         attributes.addFlashAttribute("deleted", msg);
 
@@ -221,12 +299,20 @@ public class HomeController {
                                   RedirectAttributes attributes) {
         // model.addAttribute("transfer", transfer);
 
-        List<MoneyTransfer> transactions = transferRepository.findByFrom(1);
+    	
+    	StudentProfessor currentUser = (StudentProfessor)request.getSession().getAttribute("studentSession");
+
+    	
+        List<MoneyTransfer> transactions = transferRepository.findByFrom(Math.toIntExact(currentUser.getUser().getId()));
         System.out.print(transactions);
-        List<Student> recStuds = new ArrayList<Student>();
+        List<Integer> directions = new ArrayList<Integer>();
+        List<User> recStuds = new ArrayList<User>();
         for (MoneyTransfer m : transactions) {
-            Optional<Student> recStud = studentRepository.findById(Long.valueOf(m.getTo()));
-            Student actStud = new Student();
+        	
+        	directions.add(1);
+        	
+            Optional<User> recStud = userRepository.findById(Long.valueOf(m.getTo()));
+            User actStud = new User();
             if (recStud.isPresent()) {
                 // value is present inside Optional
                 actStud = recStud.get();
@@ -235,18 +321,38 @@ public class HomeController {
             recStuds.add(actStud);
 
         }
+        
+        
+        List<MoneyTransfer> transactionsRecieved = transferRepository.findByTo(Math.toIntExact(currentUser.getUser().getId()));
+        
+        for (MoneyTransfer m : transactionsRecieved) {
+        	
+        	directions.add(0);
+        	
+            Optional<User> recStud = userRepository.findById(Long.valueOf(m.getFrom()));
+            User actStud = new User();
+            if (recStud.isPresent()) {
+                // value is present inside Optional
+                actStud = recStud.get();
+            }
+
+            recStuds.add(actStud);
+
+        }
+        transactions.addAll(transactionsRecieved);
+        model.addAttribute("directions", directions);
         model.addAttribute("transactions", transactions);
         model.addAttribute("recStuds", recStuds);
         attributes.addAttribute("transactions", transactions);
 
 
         System.out.println(transfer.getAmount());
-        Student currentUser = new Student();
-        Optional<Student> optStudent = studentRepository.findById(Long.valueOf(1));
-        float oldKonto = 0;
-        if (studentRepository.findById(Long.valueOf(1)).isPresent()) {
-            currentUser = optStudent.get();
-            float availableAmount = currentUser.getKontostand();
+        //StudentProfessor currentUser = new StudentProfessor();
+        //Optional<StudentProfessor> optStudent = studentProfessorRepository.findById(Long.valueOf(currentUser.getUser().getId()));
+        double oldKonto = 0;
+        if (studentProfessorRepository.findById(Long.valueOf(currentUser.getId())).isPresent()) {
+            //currentUser = optStudent.get();
+            double availableAmount = currentUser.getKontostand();
             oldKonto = availableAmount;
             model.addAttribute("kontostand", availableAmount);
             if (availableAmount >= transfer.getAmount() && transfer.getAmount() > 0) {
@@ -255,19 +361,38 @@ public class HomeController {
                 System.out.print("+");
                 System.out.print(availableAmount);
 
-                currentUser.setKontostand(-transfer.getAmount());
-                Optional<Student> optTargetStudent = studentRepository.findById(id);
-                transfer.setFrom(Math.toIntExact(currentUser.getId()));
+                currentUser.setKontostand(oldKonto-transfer.getAmount());
+                Optional<StudentProfessor> optTargetStudent = studentProfessorRepository.findStudentByIdUser(id);
+                transfer.setFrom(Math.toIntExact(currentUser.getUser().getId()));
 
-                Student targetStudent = optTargetStudent.get();
-                targetStudent.setKontostand(transfer.getAmount());
-                transfer.setTo(Math.toIntExact(targetStudent.getId()));
+                StudentProfessor targetStudent = optTargetStudent.get();
+                double oldKOntoTarget= targetStudent.getKontostand();
+                targetStudent.setKontostand( oldKOntoTarget+transfer.getAmount());
+                transfer.setTo(Math.toIntExact(targetStudent.getUser().getId()));
                 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                transfer.setDatetime(timestamp);
+                transfer.setDate(timestamp);
 
                 transferRepository.save(transfer);
-                studentRepository.save(targetStudent);
-                studentRepository.save(currentUser);
+                studentProfessorRepository.save(targetStudent);
+                studentProfessorRepository.save(currentUser);
+                
+                
+                SimpleMailMessage msgSend = new SimpleMailMessage();
+                msgSend.setTo(currentUser.getUser().getEmail());
+               // System.out.println(friend.get().getUser().getName());
+                msgSend.setSubject( "UniPays INFO: Sie haben Geld gesendet");
+                msgSend.setText("Sie haben "+transfer.getAmount()+" Euro an "+targetStudent.getUser().getNachname()+" " +targetStudent.getUser().getNachname()+"gesendet");
+               
+                javaMailSender.send(msgSend);
+                
+                SimpleMailMessage msgRecieved = new SimpleMailMessage();
+                msgRecieved.setTo(targetStudent.getUser().getEmail());
+               // System.out.println(friend.get().getUser().getName());
+                msgRecieved.setSubject( "UniPays INFO: Sie haben Geld empfangen");
+                msgRecieved.setText("Sie haben "+transfer.getAmount()+" Euro von "+currentUser.getUser().getNachname()+" " +currentUser.getUser().getNachname()+"empfangen");
+               
+                javaMailSender.send(msgRecieved);
+                
 
 
                 if (oldKonto != currentUser.getKontostand()) {
@@ -276,17 +401,19 @@ public class HomeController {
 
             }
 
+        }else {
+        	System.out.println("Not found");
         }
 
-        List<Friend> currFriends = friendRepository.findByuserId(Long.valueOf(1));
+        List<Friend> currFriends = friendRepository.findByuserId(Long.valueOf(currentUser.getUser().getId()));
 
-        List<Student> studFriends = new ArrayList<Student>();
+        List<User> studFriends = new ArrayList<User>();
         {
         }
         ;
         for (Friend f : currFriends) {
-            Optional<Student> studF = studentRepository.findById(f.getFriendId());
-            Student actStud = new Student();
+            Optional<User> studF = userRepository.findById(f.getFriendId());
+            User actStud = new User();
             if (studF.isPresent()) {
                 // value is present inside Optional
                 actStud = studF.get();
@@ -309,15 +436,68 @@ public class HomeController {
     @RequestMapping(value = "/sendMoney")
     public ModelAndView sendMoneywoF(Model model, HttpServletRequest request, RedirectAttributes attributes) {
 
-        List<Friend> currFriends = friendRepository.findByuserId(Long.valueOf(1));
+    	
+    	
+    	StudentProfessor curUser = (StudentProfessor)request.getSession().getAttribute("studentSession");
+    	
+    	
+
+        List<MoneyTransfer> transactions = transferRepository.findByFrom(Math.toIntExact(curUser.getUser().getId()));
+        System.out.print(transactions);
+        List<Integer> directions = new ArrayList<Integer>();
+        List<User> recStuds = new ArrayList<User>();
+        for (MoneyTransfer m : transactions) {
+        	
+        	directions.add(1);
+        	
+            Optional<User> recStud = userRepository.findById(Long.valueOf(m.getTo()));
+            User actStud = new User();
+            if (recStud.isPresent()) {
+                // value is present inside Optional
+                actStud = recStud.get();
+            }
+
+            recStuds.add(actStud);
+
+        }
+        model.addAttribute("directions", directions);
+        model.addAttribute("transactions", transactions);
+        model.addAttribute("recStuds", recStuds);
+        attributes.addAttribute("transactions", transactions);
+        
+        
+        List<MoneyTransfer> transactionsRecieved = transferRepository.findByTo(Math.toIntExact(curUser.getUser().getId()));
+    
+        for (MoneyTransfer m : transactionsRecieved) {
+        	
+        	directions.add(0);
+        	
+            Optional<User> recStud = userRepository.findById(Long.valueOf(m.getFrom()));
+            User actStud = new User();
+            if (recStud.isPresent()) {
+                // value is present inside Optional
+                actStud = recStud.get();
+            }
+
+            recStuds.add(actStud);
+
+        }
+        transactions.addAll(transactionsRecieved);
+        model.addAttribute("directions", directions);
+        model.addAttribute("transactions", transactions);
+        model.addAttribute("recStuds", recStuds);
+        attributes.addAttribute("transactions", transactions);
+
+    	
+        List<Friend> currFriends = friendRepository.findByuserId(Long.valueOf(curUser.getUser().getId()));
         // System.out.print("No Friend recieved");
-        List<Student> studFriends = new ArrayList<Student>();
+        List<User> studFriends = new ArrayList<User>();
         {
         }
         ;
         for (Friend f : currFriends) {
-            Optional<Student> studF = studentRepository.findById(f.getFriendId());
-            Student actStud = new Student();
+            Optional<User> studF = userRepository.findById(f.getFriendId());
+            User actStud = new User();
             if (studF.isPresent()) {
                 // value is present inside Optional
                 actStud = studF.get();
@@ -342,7 +522,7 @@ public class HomeController {
         return new ModelAndView("/sendToFriend");
     }
 
-    @GetMapping("/studentSearch")
+   /* @GetMapping("/studentSearch")
     public String findAll(Model model) {
         // model.addAttribute("registration");
 
@@ -350,6 +530,10 @@ public class HomeController {
         model.addAttribute("students", students);
         // System.out.println(students.get(0).getName());
         return "students-list";
-    }
+    }*/
+    
+   
+	
+	
 
 }
