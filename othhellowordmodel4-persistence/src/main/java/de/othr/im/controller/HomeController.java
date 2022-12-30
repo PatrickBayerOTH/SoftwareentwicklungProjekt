@@ -31,8 +31,16 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+
 @Controller
 public class HomeController {
+	
+	
+	 @Autowired
+	 private JavaMailSender javaMailSender;
 
 
     @Autowired
@@ -206,7 +214,9 @@ public class HomeController {
         if (friendRepository.findByuserIdAndFriendId(curUser.getUser().getId(), id) == null && id != curUser.getUser().getId()) {
 
             //Optional<Student> friend = studentRepository.findById(id);
-        	Optional<StudentProfessor> friend = studentProfessorRepository.findById(id);//studentProfessorRepository.findById(id);
+        	
+        	Optional<StudentProfessor> friend = studentProfessorRepository.findStudentByIdUser(id);//studentProfessorRepository.findById(id);
+        	System.out.println(id);
             List<Friend> friends = friendRepository.findByuserId(curUser.getUser().getId());
             if (friends.isEmpty()) {
             	friends = friendRepository.findByfriendId(Long.valueOf(curUser.getUser().getId()));
@@ -228,6 +238,16 @@ public class HomeController {
             newFriendReverse.setUserId(id);
             // System.out.print(newFriend.getFriendId());
             friendRepository.save(newFriendReverse);
+            
+            
+            SimpleMailMessage msgAddFriend = new SimpleMailMessage();
+            msgAddFriend.setTo(curUser.getUser().getEmail());
+           // System.out.println(friend.get().getUser().getName());
+            msgAddFriend.setSubject( "UniPays INFO: Sie haben einen Freund hinzugefügt");
+            msgAddFriend.setText("Sie haben "+friend.get().getUser().getNachname()+" " +friend.get().getUser().getNachname()+"als Freund hinzugefügt");
+           
+            javaMailSender.send(msgAddFriend);
+            
 
             String msg = "Erfolgreich";
             attributes.addFlashAttribute("success", msg);
@@ -251,11 +271,22 @@ public class HomeController {
     	
     	StudentProfessor curUser = (StudentProfessor)request.getSession().getAttribute("studentSession");
 
-    	
+    	//sendEmail();
     	
         long deletedFriends = friendRepository.deleteByuserIdAndFriendId(Long.valueOf(curUser.getUser().getId()), id);
         
         long deletedFriendsS = friendRepository.deleteByFriendIdAndUserId(Long.valueOf(curUser.getUser().getId()),id);
+        
+        Optional<StudentProfessor> friend = studentProfessorRepository.findStudentByIdUser(id);
+        
+        SimpleMailMessage msgRemoveFriend = new SimpleMailMessage();
+        msgRemoveFriend.setTo(curUser.getUser().getEmail());
+       // System.out.println(friend.get().getUser().getName());
+        msgRemoveFriend.setSubject( "UniPays INFO: Sie haben einen Freund entfernt");
+        msgRemoveFriend.setText("Sie haben "+friend.get().getUser().getNachname()+" " +friend.get().getUser().getNachname()+"als Freund entfernt");
+       
+        javaMailSender.send(msgRemoveFriend);
+        
         String msg = "Freund entfernt";
         attributes.addFlashAttribute("deleted", msg);
 
@@ -344,6 +375,24 @@ public class HomeController {
                 transferRepository.save(transfer);
                 studentProfessorRepository.save(targetStudent);
                 studentProfessorRepository.save(currentUser);
+                
+                
+                SimpleMailMessage msgSend = new SimpleMailMessage();
+                msgSend.setTo(currentUser.getUser().getEmail());
+               // System.out.println(friend.get().getUser().getName());
+                msgSend.setSubject( "UniPays INFO: Sie haben Geld gesendet");
+                msgSend.setText("Sie haben "+transfer.getAmount()+" Euro an "+targetStudent.getUser().getNachname()+" " +targetStudent.getUser().getNachname()+"gesendet");
+               
+                javaMailSender.send(msgSend);
+                
+                SimpleMailMessage msgRecieved = new SimpleMailMessage();
+                msgRecieved.setTo(targetStudent.getUser().getEmail());
+               // System.out.println(friend.get().getUser().getName());
+                msgRecieved.setSubject( "UniPays INFO: Sie haben Geld empfangen");
+                msgRecieved.setText("Sie haben "+transfer.getAmount()+" Euro von "+currentUser.getUser().getNachname()+" " +currentUser.getUser().getNachname()+"empfangen");
+               
+                javaMailSender.send(msgRecieved);
+                
 
 
                 if (oldKonto != currentUser.getKontostand()) {
@@ -482,5 +531,9 @@ public class HomeController {
         // System.out.println(students.get(0).getName());
         return "students-list";
     }*/
+    
+   
+	
+	
 
 }
