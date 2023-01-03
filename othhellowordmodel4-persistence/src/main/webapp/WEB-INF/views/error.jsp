@@ -19,7 +19,7 @@
 <hr>
 
 <div class="alert alert-danger" role="alert">
-    Error
+    Error, bitte melden sie sich nochmal
 </div>
 
 

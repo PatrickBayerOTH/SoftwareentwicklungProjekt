@@ -19,7 +19,7 @@
 
 <br>
 <div class="alert alert-success" role="alert">
-    <span text="'Verifizierung Ihrere Email ist zu der Email: ' + ${emailId}"> </span>
+    Bitte verifizieren Sie Ihre Email
 </div>
 <br>
 

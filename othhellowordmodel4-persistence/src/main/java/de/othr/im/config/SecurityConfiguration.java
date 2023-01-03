@@ -32,11 +32,9 @@ public class SecurityConfiguration {
                 .antMatchers("/login").permitAll() //all users can access this page
                 .antMatchers("/user/student/add").permitAll()
                 .antMatchers("/user/student/add/process").permitAll()
-                //.antMatchers("/user/delete/${id}").permitAll()
-
-                //more permissions here....
+                .antMatchers("/user/confirm-account").permitAll()//more permissions here....
                 .antMatchers("/admin/**", "/settings/**").hasAuthority("ADMIN")
-                .antMatchers("/student/**", "/settings/**").hasAuthority("STUDENT")
+                //.antMatchers("/student/**", "/settings/**").hasAuthority("STUDENT")
                 //.antMatchers("/professor/**", "/settings/**").hasAuthority("PROFESSOR")
 
 

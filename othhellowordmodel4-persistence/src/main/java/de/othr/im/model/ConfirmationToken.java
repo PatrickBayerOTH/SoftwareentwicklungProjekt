@@ -1,6 +1,6 @@
-/*
 package de.othr.im.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -8,11 +8,12 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "confirmationToken")
-public class ConfirmationToken {
+public class ConfirmationToken implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "confirmation_token")
     private String confirmationToken;
@@ -20,15 +21,9 @@ public class ConfirmationToken {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
 
-*/
-/*    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "iduser", referencedColumnName = "tokenid")
-    private User user;*//*
-
-
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(name = "iduser", referencedColumnName = "id")
-    User user;
+    @JoinColumn(nullable = false, name = "iduser")
+    private User user;
 
     public ConfirmationToken() {
     }
@@ -39,11 +34,12 @@ public class ConfirmationToken {
         confirmationToken = UUID.randomUUID().toString();
     }
 
-    public long getId() {
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -70,5 +66,6 @@ public class ConfirmationToken {
     public void setUser(User user) {
         this.user = user;
     }
+
+
 }
-*/

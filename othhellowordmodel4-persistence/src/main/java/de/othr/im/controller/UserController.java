@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Controller
@@ -38,13 +39,15 @@ public class UserController {
     UserRepository userRepository;
 
     @Autowired
-    EmailService emailService;
+    private JavaMailSender javaMailSender;
 
-/*    @Autowired
-    UserEmailConfirmationRepository userEmailConfirmationRepository;*/
 
-/*    @Autowired
-    ConfirmationTokenRepository confirmationTokenRepository;*/
+    @Autowired
+    private UserEmailConfirmationRepository userEmailConfirmationRepository;
+
+
+    @Autowired
+    private ConfirmationTokenRepository confirmationTokenRepository;
 
 
     @RequestMapping(value = "/student/add", method = RequestMethod.GET)
@@ -122,83 +125,65 @@ public class UserController {
             List<Authority> myauthorities = new ArrayList<Authority>();
             myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
             user.setMyauthorities(myauthorities);
-            user.setActive(1);
+            user.setActive(0);
 
-            user = userRepository.save(user);
-/*
+            userRepository.save(user);
 
-
-            ConfirmationToken confirmationToken = new ConfirmationToken(user);
-            SimpleMailMessage mailMessage = new SimpleMailMessage();
-            mailMessage.setTo(studentProfessor.getUser().getEmail());
-            mailMessage.setSubject("Complete Registration!");
-            mailMessage.setText("To confirm your account, please click here : "
-                    + "http://localhost:8080/confirm-account?token=" + confirmationToken.getConfirmationToken());
-
-            emailService.sendEmail(mailMessage);
-*/
 
             studentProfessor.setMatrikelnummer(user.getMatrikelnummer());
             studentProfessor.setUser(user);
             studentProfessorRepository.save(studentProfessor);
 
-            mv.addObject("emailId", studentProfessor.getUser().getEmail());
+
             mv.addObject("name", studentProfessor.getUser().getName());
             mv.addObject("email", studentProfessor.getUser().getEmail());
 
             mv.setViewName("/verwalten/student-added");
+
+            this.emailSender(user);
 
             return mv;
         }
 
     }
 
-  /*  // Wenn User aufm Link klickt
-    @RequestMapping(value = "/confirm-account", method = {RequestMethod.GET, RequestMethod.POST})
-    public ModelAndView confirmUserAccount(ModelAndView mv, @RequestParam("token") String confirmationToken) {
+    // Email mit Link senden
+    @RequestMapping(value = "/email-sender")
+    private void emailSender(User user) {
 
+        ConfirmationToken confirmationToken = new ConfirmationToken(user);
+        confirmationTokenRepository.save(confirmationToken);
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setSubject("Complete Registration!");
+        mailMessage.setText("To confirm your account, please click here : "
+                + "http://localhost:8080/user/confirm-account?token=" + confirmationToken.getConfirmationToken());
+
+        javaMailSender.send(mailMessage);
+
+    }
+
+    // Wenn User aufm Link klickt
+    @RequestMapping(value = "/confirm-account", method = {RequestMethod.GET, RequestMethod.POST})
+    public ModelAndView confirmUserAccount(@RequestParam("token") String confirmationToken) {
+
+        ModelAndView mv = new ModelAndView();
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
 
-        if (token != null) {
-            User user = userEmailConfirmationRepository.findByEmailIdIgnoreCase(token.getUser().getEmail());
+
+        if (token != null && token.getUser().getId() == token.getId()) {
+            User user = userEmailConfirmationRepository.findByEmailIgnoreCase(token.getUser().getEmail());
             user.setActive(1);
             userRepository.save(user);
             mv.setViewName("verwalten/accountVerified");
+            return mv;
         } else {
             mv.addObject("message", "The link is invalid or broken!");
             mv.setViewName("verwalten/emailError");
+            return mv;
         }
-
-        return mv;
-    }*/
-
-
-
-  /*
-    // send verification Email
-    private void sendverificationEmail(User user, String siteURL) throws MessagingException, UnsupportedEncodingException {
-        String subject = "Please verify your registration";
-        String senderName = "UniPay Team";
-        String mailContent = "Hallo" + user.getName() + user.getNachname() + ",</p>";
-        mailContent += "<p>Please click the link below to verify to your registration:</p>";
-
-        String verifyURL = siteURL + "/verify?code" + user.getVerificationCode();
-        mailContent += "<h3><a herf=\"" + verifyURL + "\">VERIFY</a></h3>";
-
-        mailContent += "<p>Thank you<br>The UniPay Team";
-
-
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-
-        helper.setFrom("abdallah.alsoudi@st.oth-regensburg.de", senderName);
-        helper.setTo(user.getEmail());
-        helper.setSubject(subject);
-        helper.setText(mailContent, true);
-
-        mailSender.send(mimeMessage);
-
-    }*/
+    }
 
 
     //TODO: PASSWORD UPDATE

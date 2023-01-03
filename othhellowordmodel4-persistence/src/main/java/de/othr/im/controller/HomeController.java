@@ -82,7 +82,6 @@ public class HomeController {
             request.getSession().setAttribute("managerSession", oManager.get());
 
             mv.setViewName("/manager");
-            return mv;
 
         }
         if (myAuthorities.contains("STUDENT")) {
@@ -91,12 +90,12 @@ public class HomeController {
             optionalStudentRepository = studentProfessorRepository.findStudentByIdUser(oLoggedUser.get().getId());
             request.getSession().setAttribute("studentSession", optionalStudentRepository.get());
             mv.setViewName("/student");
-            return mv;
 
         } else {
             mv.setViewName("/login");
-            return mv;
+
         }
+        return mv;
     }
 
 

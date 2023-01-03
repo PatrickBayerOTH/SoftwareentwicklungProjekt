@@ -12,7 +12,7 @@ public class Manager {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private int matrikelnummer;
 
     @OneToOne(cascade = CascadeType.MERGE)
