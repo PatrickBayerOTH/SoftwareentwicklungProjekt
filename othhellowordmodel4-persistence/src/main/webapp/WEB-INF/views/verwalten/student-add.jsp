@@ -64,7 +64,8 @@
             <div class="form-group row">
                 <label class="col-4 col-form-label" for="user.password">Password: </label>
                 <div class="col-8">
-                    <form:input path="user.password" id="user.password" class="form-control" type="password"></form:input>
+                    <form:input path="user.password" id="user.password" class="form-control"
+                                type="password"></form:input>
                     <form:errors path="user.password"></form:errors>
                 </div>
             </div>
@@ -76,17 +77,6 @@
                     <form:errors path="user.type"></form:errors>
                 </div>
             </div>
-
-<%--            <div class="form-group row">
-                <label class="col-4 col-form-label">Type: </label>
-                <div class="col-8">
-                    <select class="form-select" aria-label="Default select example">
-                        <option disabled="true" for="user.type">Type auswählen</option>
-                        <option  path="user.type" class="user.type">Student</option>
-                        <option  path="user.type" class="user.type">Professor</option>
-                    </select>
-                </div>
-            </div>--%>
 
             <br>
             <br>

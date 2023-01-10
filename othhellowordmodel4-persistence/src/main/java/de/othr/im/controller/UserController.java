@@ -41,7 +41,6 @@ public class UserController {
     @Autowired
     private ConfirmationTokenRepository confirmationTokenRepository;
 
-
     @RequestMapping(value = "/student/add", method = RequestMethod.GET)
     public ModelAndView addStudentForm() {
 
@@ -64,8 +63,6 @@ public class UserController {
 
         ModelAndView mv = new ModelAndView();
 
-        String othEmail = "@st.oth-regensburg.de";
-
         if (studentProfessor.getUser().getMatrikelnummer() == null) {
             bindingResult.rejectValue("user.matrikelnummer", "error", "Matrikelnummer Ein Feld ist leer eingegeben.");
             mv.setViewName("redirect:/user/student/add");
@@ -77,7 +74,7 @@ public class UserController {
             return mv;
         }
 
-        if (studentProfessor.getUser().getEmail().contains(othEmail)) {
+        if (studentProfessor.getUser().getEmail().isEmpty()) {
             bindingResult.rejectValue("user.email", "error", "Email Feld ist leer eingegeben.");
             mv.setViewName("redirect:/user/student/add");
             return mv;
@@ -109,8 +106,8 @@ public class UserController {
         }
 
         User user = studentProfessor.getUser();
-
         Optional<User> userDB = userRepository.findUserByEmail(user.getEmail());
+
         if (userDB.isPresent()) {
             System.out.println("User already exists!");
 
@@ -119,16 +116,17 @@ public class UserController {
             mv.setViewName("redirect:/user/student/add");
             return mv;
         }
-        /*else if (studentProfessor.getUser().getEmail().contains(othEmail)) {*/
+        String checkEmail = user.getEmail();
+        if (checkEmail.contains("@st.oth-regensburg.de")) {
 
             List<Authority> myauthorities = new ArrayList<Authority>();
             myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
             user.setMyauthorities(myauthorities);
+
             user.setActive(0);
             user.setAuthProvider(AuthenticationProvider.LOCAL);
 
             userRepository.save(user);
-
 
             studentProfessor.setMatrikelnummer(user.getMatrikelnummer());
             studentProfessor.setUser(user);
@@ -138,10 +136,15 @@ public class UserController {
             mv.addObject("name", studentProfessor.getUser().getName());
             mv.addObject("email", studentProfessor.getUser().getEmail());
 
+
             mv.setViewName("/verwalten/student-added");
 
             this.emailSender(user);
             return mv;
+        } else {
+            mv.setViewName("/error");
+            return mv;
+        }
 
     }
 

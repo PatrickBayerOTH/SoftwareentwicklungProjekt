@@ -19,7 +19,7 @@
 <hr>
 
 <div class="alert alert-danger" role="alert">
-    Error, bitte melden sie sich nochmal
+    Error, bitte melden sie sich nochmal an, oder geben Sie eine gültige Email an
 </div>
 
 
