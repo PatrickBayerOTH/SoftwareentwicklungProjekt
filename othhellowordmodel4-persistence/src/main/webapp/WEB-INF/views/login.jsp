@@ -13,10 +13,15 @@
           integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
 </head>
 
+<br><br>
+<h4 class="mt-1 mb-5 pb-1">We are The UniPay Team</h4>
+
+<div>
+    <h4><a href="/oauth2/authorization/google"> Login with Google</a></h4>
+</div>
+
 <body>
 <form action="${loginUrl}" method="post" class="h-100 gradient-form" style="background-color: #eee;">
-    <br><br>
-    <h4 class="mt-1 mb-5 pb-1">We are The UniPay Team</h4>
 
     <div class="mb-3">
         <p>

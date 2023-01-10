@@ -16,7 +16,7 @@ public class MyUserDetails implements UserDetails {
 
     private static final long serialVersionUID = 1L;
 
-    private String username;
+    private String email;
     private String password;
     private boolean active;
 
@@ -25,24 +25,23 @@ public class MyUserDetails implements UserDetails {
     public MyUserDetails(User user) {
         // TODO Auto-generated constructor stub
 
-
-        this.username = user.getMatrikelnummer().toString();
+        this.email = user.getEmail();
         this.password = user.getPassword();
         System.out.println("password of the user is=" + this.password);
-        System.out.println("matrikelnummer of the user is=" + this.username);
+        System.out.println("email of the user is=" + this.email);
         this.active = (user.getActive() > 0) ? true : false;
 
 
         List<Authority> myauthorities = (List<Authority>) user.getMyauthorities();
 
-        System.out.println("the user " + user.getMatrikelnummer() + " has " +
+        System.out.println("the user " + user.getEmail() + " has " +
                 myauthorities.size() + " authorities");
 
         authorities = new ArrayList<>();
 
         for (int i = 0; i < myauthorities.size(); i++) {
             authorities.add(new SimpleGrantedAuthority(myauthorities.get(i).getDescription().toUpperCase()));
-            System.out.println("the profile" + i + " of " + user.getMatrikelnummer() + " is " + myauthorities.get(0).getDescription());
+            System.out.println("the profile" + i + " of " + user.getEmail() + " is " + myauthorities.get(0).getDescription());
         }
     }
 
@@ -60,7 +59,7 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.username;
+        return this.email;
     }
 
     @Override
@@ -83,12 +82,6 @@ public class MyUserDetails implements UserDetails {
         return this.active;
     }
 
-
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public void setPassword(String password) {
         this.password = password;
     }
@@ -109,4 +102,12 @@ public class MyUserDetails implements UserDetails {
         this.authorities = authorities;
     }
 
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

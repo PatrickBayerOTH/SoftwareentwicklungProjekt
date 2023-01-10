@@ -34,12 +34,16 @@ public class LoginController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/prelogout")
-    public ModelAndView showPreLogout(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView showPreLogout() {
 
         ModelAndView mv = new ModelAndView();
         mv.setViewName("/prelogout");
         return mv;
     }
+
+
+
+
 
 
 }

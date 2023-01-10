@@ -69,13 +69,25 @@
                 </div>
             </div>
             <br>
-            <div class="form-group row">
+          <div class="form-group row">
                 <label class="col-4 col-form-label" for="user.type">Type: </label>
                 <div class="col-8">
                     <form:input path="user.type" type="text" id="user.type" class="form-control"></form:input>
                     <form:errors path="user.type"></form:errors>
                 </div>
             </div>
+
+<%--            <div class="form-group row">
+                <label class="col-4 col-form-label">Type: </label>
+                <div class="col-8">
+                    <select class="form-select" aria-label="Default select example">
+                        <option disabled="true" for="user.type">Type auswählen</option>
+                        <option  path="user.type" class="user.type">Student</option>
+                        <option  path="user.type" class="user.type">Professor</option>
+                    </select>
+                </div>
+            </div>--%>
+
             <br>
             <br>
 

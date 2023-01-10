@@ -44,29 +44,32 @@
 <br><br><br><br>
 
 <form:form method="POST" modelAttribute="studentForm" action="/user/update/process">
-        <form:hidden path="id" cssClass="form-control"/>
+    <form:hidden path="id" cssClass="form-control"/>
 
-        <label for="email">Email</label>
-        <form:input path="email" cssClass="form-control"/>
+    <label for="email">Email</label>
+    <form:input readonly="true" path="email" cssClass="form-control"/>
 
-        <label for="matrikelnummer">Marikelnummer</label>
-        <form:input path="matrikelnummer" cssClass="form-control"/>
+    <label for="matrikelnummer">Marikelnummer</label>
+    <form:input readonly="true" path="matrikelnummer" cssClass="form-control"/>
 
-        <label for="nachname">Nachname</label>
-        <form:input path="nachname" cssClass="form-control"/>
+    <label for="nachname">Nachname</label>
+    <form:input path="nachname" cssClass="form-control"/>
 
-        <label for="name">Name</label>
-        <form:input path="name" cssClass="form-control"/>
+    <label for="name">Name</label>
+    <form:input path="name" cssClass="form-control"/>
 
-        <label for="password">password</label>
-        <form:input path="password" cssClass="form-control"/>
+    <label for="password">password</label>
+    <form:input path="password" cssClass="form-control"/>
 
-        <label for="type">Type</label>
-        <form:input path="type" cssClass="form-control"/>
+    <label for="type">Type</label>
+    <form:input path="type" cssClass="form-control"/>
 
-        <br>
+    <label for="authProvider">Provider</label>
+    <form:input readonly="true" path="authProvider" cssClass="form-control"/>
 
-        <input type="submit" value="Update" class="btn btn-primary">
+    <br>
+
+    <input type="submit" value="Update" class="btn btn-primary">
 
 </form:form>
 

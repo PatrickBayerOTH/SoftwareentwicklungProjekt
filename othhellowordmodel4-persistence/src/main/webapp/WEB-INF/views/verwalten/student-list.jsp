@@ -46,7 +46,7 @@
 </div>
 <br>
 <br><br>
-<table class="table"  border="2" width="70%" cellpadding="2">
+<table class="table" border="2" width="70%" cellpadding="2">
 
     <tr>
         <th scope="col">Email</th>
@@ -54,15 +54,17 @@
         <th scope="col">Nachname</th>
         <th scope="col">Name</th>
         <th scope="col">Type</th>
+        <th scope="col">Provider</th>
     </tr>
 
-        <tr>
-            <td>${studentSession.user.email}</td>
-            <td>${studentSession.user.matrikelnummer}</td>
-            <td>${studentSession.user.nachname}</td>
-            <td>${studentSession.user.name}</td>
-            <td>${studentSession.user.type}</td>
-        </tr>
+    <tr>
+        <td>${studentSession.user.email}</td>
+        <td>${studentSession.user.matrikelnummer}</td>
+        <td>${studentSession.user.nachname}</td>
+        <td>${studentSession.user.name}</td>
+        <td>${studentSession.user.type}</td>
+        <td>${studentSession.user.authProvider}</td>
+    </tr>
 
 </table>
 <br><br>

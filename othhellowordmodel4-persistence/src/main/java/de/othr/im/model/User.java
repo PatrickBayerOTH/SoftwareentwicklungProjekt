@@ -15,29 +15,30 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false,unique = true)
+    @Column( unique = true)
     private Integer matrikelnummer;
 
-    @Column(nullable = false,unique = true)
+    @Column(unique = true,nullable = false)
     @Email(message = "Please, inform a valid E-Mail!")
     private String email;
 
-    @Column(nullable = false)
-    @Size(min = 4, message = "Nachname must contain at least 4 characters!")
+    @Size(min = 3, message = "Nachname must contain at least 3 characters!")
     private String nachname;
 
-    @Column(nullable = false)
-    @Size(min = 4, message = "Name must contain at least 4 characters!")
+    @Size(min = 3, message = "Name must contain at least 3 characters!")
     private String name;
 
-    @Column(nullable = false)
-    @Size(min = 6, message = "Password must contain at least 6 characters!")
+    @Size(min = 5, message = "Password must contain at least 5 characters!")
     private String password;
 
-    @Column(nullable = false)
     private String type;
 
     private Integer active;
+
+
+    @Enumerated(EnumType.STRING)
+    private AuthenticationProvider authProvider;
+
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(
@@ -119,4 +120,11 @@ public class User {
         this.type = type;
     }
 
+    public AuthenticationProvider getAuthProvider() {
+        return authProvider;
+    }
+
+    public void setAuthProvider(AuthenticationProvider authProvider) {
+        this.authProvider = authProvider;
+    }
 }

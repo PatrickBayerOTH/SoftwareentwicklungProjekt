@@ -1,29 +1,21 @@
 package de.othr.im.controller;
 
 import de.othr.im.model.*;
+import de.othr.im.model.AuthenticationProvider;
+import de.othr.im.model.oauthUser.CustomOAuth2User;
 import de.othr.im.repository.*;
-import de.othr.im.service.EmailService;
 import de.othr.im.util.Constants;
-import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/user")
@@ -72,6 +64,7 @@ public class UserController {
 
         ModelAndView mv = new ModelAndView();
 
+        String othEmail = "@st.oth-regensburg.de";
 
         if (studentProfessor.getUser().getMatrikelnummer() == null) {
             bindingResult.rejectValue("user.matrikelnummer", "error", "Matrikelnummer Ein Feld ist leer eingegeben.");
@@ -79,6 +72,12 @@ public class UserController {
             return mv;
         }
         if (studentProfessor.getUser().getEmail().isEmpty()) {
+            bindingResult.rejectValue("user.email", "error", "Email Feld ist leer eingegeben.");
+            mv.setViewName("redirect:/user/student/add");
+            return mv;
+        }
+
+        if (studentProfessor.getUser().getEmail().contains(othEmail)) {
             bindingResult.rejectValue("user.email", "error", "Email Feld ist leer eingegeben.");
             mv.setViewName("redirect:/user/student/add");
             return mv;
@@ -111,21 +110,22 @@ public class UserController {
 
         User user = studentProfessor.getUser();
 
-        Optional<User> userDB = userRepository.findUserByMatrikelnummer(user.getMatrikelnummer());
+        Optional<User> userDB = userRepository.findUserByEmail(user.getEmail());
         if (userDB.isPresent()) {
             System.out.println("User already exists!");
 
-            // bindingResult.rejectValue("user.matrikelnummer", "error", "An account already exists for this login.");
-            //mv.setViewName("redirect:/user/student/add");
+            //bindingResult.rejectValue("user.matrikelnummer", "error", "An account already exists for this login.");
             mv.addObject("message", "An account already exists for this login.");
-            mv.setViewName("/error");
+            mv.setViewName("redirect:/user/student/add");
             return mv;
-        } else {
+        }
+        /*else if (studentProfessor.getUser().getEmail().contains(othEmail)) {*/
 
             List<Authority> myauthorities = new ArrayList<Authority>();
             myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
             user.setMyauthorities(myauthorities);
             user.setActive(0);
+            user.setAuthProvider(AuthenticationProvider.LOCAL);
 
             userRepository.save(user);
 
@@ -141,9 +141,7 @@ public class UserController {
             mv.setViewName("/verwalten/student-added");
 
             this.emailSender(user);
-
             return mv;
-        }
 
     }
 
@@ -171,8 +169,7 @@ public class UserController {
         ModelAndView mv = new ModelAndView();
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
 
-
-        if (token != null && token.getUser().getId() == token.getId()) {
+        if (token != null && token.getUser().getId() != null) {
             User user = userEmailConfirmationRepository.findByEmailIgnoreCase(token.getUser().getEmail());
             user.setActive(1);
             userRepository.save(user);
@@ -186,7 +183,6 @@ public class UserController {
     }
 
 
-    //TODO: PASSWORD UPDATE
     @RequestMapping(value = "/update/{id}")
     public ModelAndView update1(@PathVariable("id") Long iduser) {
 
@@ -203,6 +199,7 @@ public class UserController {
         if (managerRepository.existsById(iduser)) {
             mv.setViewName("/verwalten/manager-update");
             mv.addObject("managerForm", oManager.get().getId());
+
             return mv;
         } else {
             mv.addObject("errors", "Event not Found");
@@ -218,16 +215,27 @@ public class UserController {
 
         ModelAndView mv = new ModelAndView();
 
-        mv.addObject("password", user.getPassword());
+        //mv.addObject("password", user.getPassword());
+        Integer mtnr = user.getMatrikelnummer();
+        String email = user.getEmail();
+
         List<Authority> myauthorities = new ArrayList<Authority>();
         myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
         user.setMyauthorities(myauthorities);
         user.setActive(1);
+        user.setEmail(email);
+        user.setMatrikelnummer(mtnr);
+        user.setPassword(user.getPassword());
+        user.setNachname(user.getNachname());
+        user.setName(user.getName());
+        user.setType(user.getType());
+        user.setAuthProvider(user.getAuthProvider());
+
 
         userRepository.save(user);
         mv.setViewName("verwalten/student-updated");
 
-        studentProfessor.setMatrikelnummer(user.getMatrikelnummer());
+        studentProfessor.setMatrikelnummer(mtnr);
         studentProfessor.setUser(user);
         studentProfessorRepository.save(studentProfessor);
 
@@ -248,7 +256,7 @@ public class UserController {
     public ModelAndView delete(@PathVariable("id") Long id, Model model) {
 
         ModelAndView mv = new ModelAndView();
-        Optional<StudentProfessor> optStudent = studentProfessorRepository.findById(id);
+        Optional<StudentProfessor> optStudent = studentProfessorRepository.findStudentByIdUser(id);
         Optional<User> user = userRepository.findById(id);
 
         if (userRepository.existsById(id)) {
@@ -275,8 +283,73 @@ public class UserController {
         mv.addObject("user", user.get().getNachname());
         mv.addObject("user", user.get().getName());
         mv.addObject("user", user.get().getType());
+        mv.addObject("user", user.get().getAuthProvider());
 
         mv.setViewName("/verwalten/student-list");
+        return mv;
+
+    }
+
+
+    public void updateUserAfterOAithLoginSuccess(User user, String name, AuthenticationProvider authenticationProvider) {
+
+        user.setNachname(name);
+        user.setAuthProvider(authenticationProvider);
+        userRepository.save(user);
+    }
+
+    @RequestMapping("/userWithGoogle")
+    public void processOAuthPostLogin(String email, String name) {
+
+        StudentProfessor studentProfessor = new StudentProfessor();
+        User user = new User();
+
+        user.setEmail(email);
+        user.setNachname(name);
+        user.setName(user.getName());
+        user.setPassword(UUID.randomUUID().toString());
+        user.setType("student");
+
+        List<Authority> myauthorities = new ArrayList<Authority>();
+        myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
+        user.setMyauthorities(myauthorities);
+        user.setAuthProvider(AuthenticationProvider.GOOGLE);
+        user.setActive(0);
+
+        userRepository.save(user);
+
+        studentProfessor.setUser(user);
+        studentProfessorRepository.save(studentProfessor);
+
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/matrikelNummer/process/{id}")
+    public ModelAndView updateUserAfterOAithLoginSuccess(@ModelAttribute("neuMatrikelnummer") User getuser, StudentProfessor studentProfessor, @PathVariable("id") Long id, Authentication authentication) {
+        ModelAndView mv = new ModelAndView();
+        CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
+        String email = oauthUser.getEmail();
+
+        Integer user1 = getuser.getMatrikelnummer();
+        Optional<User> user = userRepository.findUserByEmail(email);
+
+        mv.addObject("matrikelnummer", user.get().getMatrikelnummer());
+
+        if (user.isPresent()) {
+            List<Authority> myauthorities = new ArrayList<Authority>();
+            myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
+            user.get().setMyauthorities(myauthorities);
+            user.get().setActive(1);
+            mv.addObject("matrikelnummer", user.get().getMatrikelnummer());
+            user.get().setMatrikelnummer(user1);
+
+            userRepository.save(user.get());
+
+            studentProfessor.setUser(user.get());
+            studentProfessor.setMatrikelnummer(user.get().getMatrikelnummer());
+            studentProfessorRepository.save(studentProfessor);
+        }
+
+        mv.setViewName("verwalten/martikelnummer-added");
         return mv;
 
     }

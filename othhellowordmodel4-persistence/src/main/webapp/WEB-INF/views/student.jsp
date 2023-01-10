@@ -44,8 +44,9 @@
 <br><br><br><br>
 
 <div class="alert alert-success" role="alert">
-    <h4 class="mt-1 mb-2 pb-1">Profile STUDENT - ${studentSession.user.name}</h4>
+    <h4 class="mt-1 mb-2 pb-1">Profile STUDENT - ${studentSession.user.nachname}</h4>
 </div>
+
 <br>
 <h4 class="mt-1 mb-5 pb-1">
     Welcome,<%=request.getRemoteUser()%> ! | <a href="/prelogout"> Logout</a>
