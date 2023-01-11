@@ -48,14 +48,15 @@
 </div>
 <br><br>
 <div>
-    <button type="button" class="alert alert-danger"><a href="/user/delete/${studentSession.user.id}">Account
-        Löschen</a>
-    </button>
+    <a href="/user/delete/${studentSession.user.id}" class="btn btn-outline-danger ui-state-active" type="button"
+       role="button">Account
+        endgültig löschen</a>
 </div>
 
 <br>
 <div>
-    <button type="button" class="alert alert-primary"><a href="/home">Home</a></button>
+    <a href="/home"class="btn btn-outline-primary ui-state-active" type="button"
+       role="button">Home</a>
 </div>
 
 

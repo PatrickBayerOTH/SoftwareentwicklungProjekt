@@ -19,7 +19,7 @@
 <hr>
 
 <div class="alert alert-danger" role="alert">
-    Error, bitte melden sie sich nochmal an, oder geben Sie eine gültige Email an
+    Error, Diese Ausführung ist fehler
 </div>
 
 
@@ -30,11 +30,12 @@
 
 <br>
 <div>
-    <button type="button" class="alert alert-primary"><a href="/home">Home</a></button>
-</div>
+    <a href="/home" class="btn btn-outline-primary ui-state-active" type="button"
+       role="button">Home</a></div>
 <br>
 <div>
-    <button type="button" class="alert alert-primary"><a href="/login">Login</a></button>
+    <a href="/login" class="btn btn-outline-primary ui-state-active" type="button"
+       role="button">Login</a>
 </div>
 
 </body>

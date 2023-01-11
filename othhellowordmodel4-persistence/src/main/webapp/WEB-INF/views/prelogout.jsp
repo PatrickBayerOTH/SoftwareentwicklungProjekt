@@ -10,17 +10,19 @@
 <body>
 <br>
 <br>
-<div class="alert alert-warning" role="alert">
+<div class="alert alert-dark" role="alert">
     Are you sure you want to leave?
 </div>
-
+<br>
 <div>
-    <button type="button" class="alert alert-warning"><a href="/login">Logout</a></button>
+    <a href="/login" class="btn btn-outline-warning ui-state-active" type="button"
+       role="button">logout</a>
 </div>
 <br>
 
 <div>
-<button type="button" class="alert alert-primary"><a href="/home">Home</a></button>
+    <a href="/home" class="btn btn-outline-primary ui-state-active" type="button"
+       role="button">Home</a>
 </div>
 
 </body>

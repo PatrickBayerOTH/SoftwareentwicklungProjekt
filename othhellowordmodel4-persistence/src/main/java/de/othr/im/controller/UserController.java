@@ -294,22 +294,23 @@ public class UserController {
     }
 
 
-    public void updateUserAfterOAithLoginSuccess(User user, String name, AuthenticationProvider authenticationProvider) {
+    public void updateUserAfterOAuthLogin(User user, String firstname, String lastname, AuthenticationProvider authenticationProvider) {
 
-        user.setNachname(name);
+        user.setNachname(lastname);
+        user.setName(firstname);
         user.setAuthProvider(authenticationProvider);
         userRepository.save(user);
     }
 
     @RequestMapping("/userWithGoogle")
-    public void processOAuthPostLogin(String email, String name) {
+    public void processOAuthPostLogin(String email, String firstname, String lastname) {
 
         StudentProfessor studentProfessor = new StudentProfessor();
         User user = new User();
 
         user.setEmail(email);
-        user.setNachname(name);
-        user.setName(user.getName());
+        user.setNachname(lastname);
+        user.setName(firstname);
         user.setPassword(UUID.randomUUID().toString());
         user.setType("student");
 
@@ -327,7 +328,7 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/matrikelNummer/process/{id}")
-    public ModelAndView updateUserAfterOAithLoginSuccess(@ModelAttribute("neuMatrikelnummer") User getuser, StudentProfessor studentProfessor, @PathVariable("id") Long id, Authentication authentication) {
+    public ModelAndView updateUserByMatrikelnummer(@ModelAttribute("neuMatrikelnummer") User getuser, StudentProfessor studentProfessor, @PathVariable("id") Long id, Authentication authentication) {
         ModelAndView mv = new ModelAndView();
         CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
         String email = oauthUser.getEmail();

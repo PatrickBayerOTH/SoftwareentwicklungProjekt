@@ -44,26 +44,35 @@
 <br><br><br><br>
 
 <div class="alert alert-success" role="alert">
-    <h4 class="mt-1 mb-2 pb-1">Profile STUDENT - ${studentSession.user.nachname}</h4>
+    <h4 class="mt-1 mb-2 pb-1">Profile STUDENT - ${studentSession.user.name} ${studentSession.user.nachname} </h4>
 </div>
 
 <br>
 <h4 class="mt-1 mb-5 pb-1">
-    Welcome,<%=request.getRemoteUser()%> ! | <a href="/prelogout"> Logout</a>
+    Welcome, ${studentSession.user.name}!
 </h4>
 
 
 <div>
-    <button type="button" class="alert alert-primary"><a href="user/all/${studentSession.user.id}">Daten
-        Aktualisieren</a>
-    </button>
-</div>
+    <%--    <button type="button" class="alert alert-primary"><a href="user/all/${studentSession.user.id}">Daten
+            Aktualisieren</a>
+        </button--%>
 
+    <a href="user/all/${studentSession.user.id}" class="btn btn-outline-primary ui-state-active" type="button"
+       role="button">Daten Aktualisieren</a>
+</div>
+<br>
 <div>
 
-    <button type="button" class="alert alert-danger"><a href="/user/student/delete">Account
+    <%--
+        <button type="button" class="alert alert-danger"><a href="/user/student/delete">Account
+            Löschen</a>
+        </button>
+    --%>
+
+    <a href="/user/student/delete" class="btn btn-outline-danger ui-state-active" type="button" role="button">Account
         Löschen</a>
-    </button>
+
 </div>
 
 

@@ -37,15 +37,23 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String email = oauthUser.getEmail();
         String name = oauthUser.getName();
 
-        //userController.processOAuthPostLogin(email, name);
-
+        String googleName = name;
+        String firstname = null;
+        String lastname = null;
+        if (googleName.contains(" ")) {
+            String[] googleNameKette = name.split(" ");
+            for (int i = 0; i < googleNameKette.length; i++) {
+                firstname = googleNameKette[0];
+                lastname = googleNameKette[1];
+            }
+        }
 
         Optional<User> user = userRepository.findUserByEmail(email);
 
         if (user.isEmpty()) {
-            userController.processOAuthPostLogin(email, name);
+                userController.processOAuthPostLogin(email, firstname, lastname);
         } else {
-            userController.updateUserAfterOAithLoginSuccess(user.get(), name, AuthenticationProvider.GOOGLE);
+            userController.updateUserAfterOAuthLogin(user.get(), firstname, lastname, AuthenticationProvider.GOOGLE);
         }
 
         response.sendRedirect("/home");

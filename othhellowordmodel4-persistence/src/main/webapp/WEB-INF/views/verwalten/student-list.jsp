@@ -67,12 +67,11 @@
     </tr>
 
 </table>
-<br><br>
+<br>
 
 <div>
-    <button type="button" class="alert alert-primary"><a href="/user/update/${studentSession.user.id}">Daten
-        Aktualisieren</a>
-    </button>
+    <a href="/user/update/${studentSession.user.id}" class="btn btn-outline-primary ui-state-active" type="button"
+       role="button">Daten Aktualisieren</a>
 </div>
 
 
