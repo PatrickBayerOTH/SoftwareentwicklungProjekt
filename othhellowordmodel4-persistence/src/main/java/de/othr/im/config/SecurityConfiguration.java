@@ -13,20 +13,20 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration implements WebMvcConfigurer {
+public class SecurityConfiguration {
+
+
 
     @Autowired
     MyUserDetailService userDetailsService;
-
 
     @Autowired
     private CustomOAuth2UserService oauthUserService;
@@ -44,12 +44,8 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/oauth2/**").permitAll()//all users can access this page
                 .antMatchers("/user/**").permitAll()//all users can access this page
-/*                .antMatchers("/user/matrikelnummer").permitAll()
-                .antMatchers("/user/student/add").permitAll()
-                .antMatchers("/user/student/add/process").permitAll()
-                .antMatchers("/user/confirm-account").permitAll()//more permissions here....
-                .antMatchers("/admin/**", "/settings/**").hasAuthority("ADMIN")
-                .antMatchers("/student/**", "/settings/**").hasAuthority("STUDENT")*/
+                //.antMatchers("/admin/**", "/settings/**").hasAuthority("ADMIN")
+                //.antMatchers("/student/**", "/settings/**").hasAuthority("STUDENT")
                 //.antMatchers("/professor/**", "/settings/**").hasAuthority("PROFESSOR")
 
 
@@ -70,7 +66,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
 
                 .logout().logoutSuccessUrl("/prelogout")
                 .invalidateHttpSession(true)
-                .permitAll().and().exceptionHandling().accessDeniedPage("/403");
+                .permitAll();//.and().exceptionHandling().accessDeniedPage("/403");
 
 
         return http.build();
@@ -88,9 +84,8 @@ public class SecurityConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public PasswordEncoder getPasswordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+    public PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
     }
-
 
 }

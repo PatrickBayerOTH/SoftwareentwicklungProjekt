@@ -19,7 +19,7 @@
 <hr>
 
 <div class="alert alert-danger" role="alert">
-    Error, Diese Ausführung ist fehler
+    Error, Diese Ausführung ist nicht erlaubt
 </div>
 
 

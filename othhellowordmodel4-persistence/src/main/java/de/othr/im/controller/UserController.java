@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,6 +21,10 @@ import java.util.*;
 @Controller
 @RequestMapping("/user")
 public class UserController {
+
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     StudentProfessorRepository studentProfessorRepository;
@@ -33,10 +38,8 @@ public class UserController {
     @Autowired
     private JavaMailSender javaMailSender;
 
-
     @Autowired
     private UserEmailConfirmationRepository userEmailConfirmationRepository;
-
 
     @Autowired
     private ConfirmationTokenRepository confirmationTokenRepository;
@@ -105,8 +108,7 @@ public class UserController {
             return mv;
         }
 
-        User user = studentProfessor.getUser();
-        Optional<User> userDB = userRepository.findUserByEmail(user.getEmail());
+        Optional<User> userDB = userRepository.findUserByEmail(studentProfessor.getUser().getEmail());
 
         if (userDB.isPresent()) {
             System.out.println("User already exists!");
@@ -116,8 +118,10 @@ public class UserController {
             mv.setViewName("redirect:/user/student/add");
             return mv;
         }
-        String checkEmail = user.getEmail();
+        String checkEmail = studentProfessor.getUser().getEmail();
         if (checkEmail.contains("@st.oth-regensburg.de")) {
+
+            User user = studentProfessor.getUser();
 
             List<Authority> myauthorities = new ArrayList<Authority>();
             myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
@@ -125,6 +129,9 @@ public class UserController {
 
             user.setActive(0);
             user.setAuthProvider(AuthenticationProvider.LOCAL);
+
+            String encodedPassword = passwordEncoder.encode(studentProfessor.getUser().getPassword());
+            user.setPassword(encodedPassword);
 
             userRepository.save(user);
 
@@ -135,11 +142,10 @@ public class UserController {
 
             mv.addObject("name", studentProfessor.getUser().getName());
             mv.addObject("email", studentProfessor.getUser().getEmail());
-
-
             mv.setViewName("/verwalten/student-added");
 
             this.emailSender(user);
+
             return mv;
         } else {
             mv.setViewName("/error");
@@ -218,7 +224,6 @@ public class UserController {
 
         ModelAndView mv = new ModelAndView();
 
-        //mv.addObject("password", user.getPassword());
         Integer mtnr = user.getMatrikelnummer();
         String email = user.getEmail();
 
@@ -312,7 +317,7 @@ public class UserController {
         user.setNachname(lastname);
         user.setName(firstname);
         user.setPassword(UUID.randomUUID().toString());
-        user.setType("student");
+        user.setType("Student");
 
         List<Authority> myauthorities = new ArrayList<Authority>();
         myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
@@ -320,12 +325,14 @@ public class UserController {
         user.setAuthProvider(AuthenticationProvider.GOOGLE);
         user.setActive(0);
 
+
         userRepository.save(user);
 
         studentProfessor.setUser(user);
         studentProfessorRepository.save(studentProfessor);
 
     }
+
 
     @RequestMapping(method = RequestMethod.POST, value = "/matrikelNummer/process/{id}")
     public ModelAndView updateUserByMatrikelnummer(@ModelAttribute("neuMatrikelnummer") User getuser, StudentProfessor studentProfessor, @PathVariable("id") Long id, Authentication authentication) {
@@ -345,6 +352,7 @@ public class UserController {
             user.get().setActive(1);
             mv.addObject("matrikelnummer", user.get().getMatrikelnummer());
             user.get().setMatrikelnummer(user1);
+
 
             userRepository.save(user.get());
 

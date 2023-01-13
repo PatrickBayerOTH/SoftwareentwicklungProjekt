@@ -54,25 +54,13 @@
 
 
 <div>
-    <%--    <button type="button" class="alert alert-primary"><a href="user/all/${studentSession.user.id}">Daten
-            Aktualisieren</a>
-        </button--%>
-
     <a href="user/all/${studentSession.user.id}" class="btn btn-outline-primary ui-state-active" type="button"
        role="button">Daten Aktualisieren</a>
 </div>
 <br>
 <div>
-
-    <%--
-        <button type="button" class="alert alert-danger"><a href="/user/student/delete">Account
-            Löschen</a>
-        </button>
-    --%>
-
     <a href="/user/student/delete" class="btn btn-outline-danger ui-state-active" type="button" role="button">Account
         Löschen</a>
-
 </div>
 
 
