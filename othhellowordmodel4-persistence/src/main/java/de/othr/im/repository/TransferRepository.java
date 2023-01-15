@@ -10,9 +10,9 @@ import de.othr.im.model.MoneyTransfer;
 
 public interface TransferRepository extends JpaRepository<MoneyTransfer, Long> {
 
-	List<MoneyTransfer> findByFrom(int from);
-	List<MoneyTransfer> findByTo(int to);
-	
+	List<MoneyTransfer> findByFrom(Long from);
+	List<MoneyTransfer> findByTo(Long to);
+
 	
 	
 }

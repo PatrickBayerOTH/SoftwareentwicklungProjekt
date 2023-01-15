@@ -56,6 +56,12 @@ public class HomeController {
     @Autowired
     TransferRepository transferRepository;
 
+    @Autowired
+    AccountRepository accountRepository;
+
+    @Autowired
+    CorporateRepository corporateRepository;
+
 
     @RequestMapping(value = {"/home", "/"})
     public ModelAndView home(HttpServletRequest request, Principal principal, Authentication authentication) {
@@ -126,7 +132,7 @@ public class HomeController {
 
         //Current User
         StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
-        System.out.println(curUser.getKontostand());
+        System.out.println(curUser.getAccount().getValue());
 
         List<Friend> currFriends = friendRepository.findByuserId(Long.valueOf(curUser.getUser().getId()));//1
         if (currFriends.isEmpty()) {
@@ -308,8 +314,7 @@ public class HomeController {
 
         StudentProfessor currentUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
 
-
-        List<MoneyTransfer> transactions = transferRepository.findByFrom(Math.toIntExact(currentUser.getUser().getId()));
+        List<MoneyTransfer> transactions = transferRepository.findByFrom(currentUser.getAccount().getId());
         System.out.print(transactions);
         List<Integer> directions = new ArrayList<Integer>();
         List<User> recStuds = new ArrayList<User>();
@@ -317,7 +322,8 @@ public class HomeController {
 
             directions.add(1);
 
-            Optional<User> recStud = userRepository.findById(Long.valueOf(m.getTo()));
+
+            Optional<User> recStud = userRepository.findById(Long.valueOf(m.getTo().getId()));
             User actStud = new User();
             if (recStud.isPresent()) {
                 // value is present inside Optional
@@ -329,13 +335,13 @@ public class HomeController {
         }
 
 
-        List<MoneyTransfer> transactionsRecieved = transferRepository.findByTo(Math.toIntExact(currentUser.getUser().getId()));
+        List<MoneyTransfer> transactionsRecieved = transferRepository.findByTo(currentUser.getAccount().getId());
 
         for (MoneyTransfer m : transactionsRecieved) {
 
             directions.add(0);
 
-            Optional<User> recStud = userRepository.findById(Long.valueOf(m.getFrom()));
+            Optional<User> recStud = userRepository.findById(Long.valueOf(m.getFrom().getId()));
             User actStud = new User();
             if (recStud.isPresent()) {
                 // value is present inside Optional
@@ -358,7 +364,7 @@ public class HomeController {
         double oldKonto = 0;
         if (studentProfessorRepository.findById(Long.valueOf(currentUser.getId())).isPresent()) {
             //currentUser = optStudent.get();
-            double availableAmount = currentUser.getKontostand();
+            double availableAmount = currentUser.getAccount().getValue();
             oldKonto = availableAmount;
             model.addAttribute("kontostand", availableAmount);
             if (availableAmount >= transfer.getAmount() && transfer.getAmount() > 0) {
@@ -367,14 +373,14 @@ public class HomeController {
                 System.out.print("+");
                 System.out.print(availableAmount);
 
-                currentUser.setKontostand(oldKonto - transfer.getAmount());
+                currentUser.getAccount().setValue(oldKonto - transfer.getAmount());
                 Optional<StudentProfessor> optTargetStudent = studentProfessorRepository.findStudentByIdUser(id);
-                transfer.setFrom(Math.toIntExact(currentUser.getUser().getId()));
+                transfer.setFrom(currentUser.getAccount());
 
                 StudentProfessor targetStudent = optTargetStudent.get();
-                double oldKOntoTarget = targetStudent.getKontostand();
-                targetStudent.setKontostand(oldKOntoTarget + transfer.getAmount());
-                transfer.setTo(Math.toIntExact(targetStudent.getUser().getId()));
+                double oldKOntoTarget = targetStudent.getAccount().getValue();
+                targetStudent.getAccount().setValue(oldKOntoTarget + transfer.getAmount());
+                transfer.setTo(targetStudent.getAccount());
                 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                 transfer.setDate(timestamp);
 
@@ -400,7 +406,7 @@ public class HomeController {
                 javaMailSender.send(msgRecieved);
 
 
-                if (oldKonto != currentUser.getKontostand()) {
+                if (oldKonto != currentUser.getAccount().getValue()) {
                     return new ModelAndView("redirect:/sendMoney");
                 }
 
@@ -445,7 +451,7 @@ public class HomeController {
         StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
 
 
-        List<MoneyTransfer> transactions = transferRepository.findByFrom(Math.toIntExact(curUser.getUser().getId()));
+        List<MoneyTransfer> transactions = transferRepository.findByFrom(curUser.getAccount().getId();
         System.out.print(transactions);
         List<Integer> directions = new ArrayList<Integer>();
         List<User> recStuds = new ArrayList<User>();
@@ -523,6 +529,39 @@ public class HomeController {
         // attributes.addFlashAttribute("targetfriend", msg);
         model.addAttribute("targetfriend", msg);
         return new ModelAndView("/sendToFriend");
+    }
+
+
+    private List<MoneyTransfer> getAffiliatedTransactions(User user) {
+        //get the account related to the user
+        Optional<StudentProfessor> studentProfessor = studentProfessorRepository.findStudentByIdUser(user.getId());
+        if(studentProfessor.isEmpty()) {
+            return null;
+        }
+        Optional<Account> account = accountRepository.findById(studentProfessor.get().getAccount().getId());
+        if(account.isEmpty()) {
+            return null;
+        }
+
+        //get inbound Transactions
+        List<MoneyTransfer> transfers = transferRepository.findByTo(account.get().getId());
+        //get outbound Transactions
+        transfers.addAll(transferRepository.findByFrom(account.get().getId()));
+        return transfers;
+    }
+
+    private String convertName(Account account) {
+        //check if account is student
+        Optional<StudentProfessor> studentProfessor = studentProfessorRepository.findByAccount(account.getId());
+        if(studentProfessor.isPresent()) {
+            String out =  studentProfessor.get().getUser().getName() + " " + studentProfessor.get().getUser().getNachname();
+            return out;
+        }
+        Optional<Corporate> corporate = corporateRepository.findByAccount(account.getId());
+        if(corporate.isPresent()) {
+            return corporate.get().getName();
+        }
+        return "";
     }
 
     @GetMapping("/mainpage")

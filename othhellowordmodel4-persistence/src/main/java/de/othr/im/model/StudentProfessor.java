@@ -17,7 +17,9 @@ public class StudentProfessor implements Serializable {
     @Column(unique = true)
     private Integer matrikelnummer;
 
-    private double kontostand;
+    @OneToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "accountid", referencedColumnName = "id")
+    private Account account;
 
     @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "iduser", referencedColumnName = "id")
@@ -39,12 +41,12 @@ public class StudentProfessor implements Serializable {
         this.matrikelnummer = matrikelnummer;
     }
 
-    public double getKontostand() {
-        return kontostand;
+    public Account getAccount() {
+        return account;
     }
 
-    public void setKontostand(double kontostand) {
-        this.kontostand = kontostand;
+    public void setAccount(Account account) {
+        this.account = account;
     }
 
     public User getUser() {
