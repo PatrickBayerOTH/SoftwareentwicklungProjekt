@@ -18,13 +18,14 @@
 <h4>${msgs}</h4>
 <br>
 
+<div>
+    <a class="btn btn-outline-primary ui-state-active" type="button" href="/login"
+       role="button">Login</a>
+</div>
 <br>
 <div>
-    <button type="button" class="alert alert-primary"><a href="/login">Login</a></button>
-</div>
-
-<div>
-    <button type="button" class="alert alert-primary"><a href="/user/student/add">Sign Up</a></button>
+    <a class="btn btn-outline-primary ui-state-active" type="button" href="/user/student/add"
+       role="button">Sign Up</a>
 </div>
 
 

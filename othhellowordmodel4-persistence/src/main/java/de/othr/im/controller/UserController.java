@@ -111,7 +111,6 @@ public class UserController {
         Optional<User> userDB = userRepository.findUserByEmail(studentProfessor.getUser().getEmail());
 
         if (userDB.isPresent()) {
-            System.out.println("User already exists!");
 
             //bindingResult.rejectValue("user.matrikelnummer", "error", "An account already exists for this login.");
             mv.addObject("message", "An account already exists for this login.");
@@ -233,11 +232,13 @@ public class UserController {
         user.setActive(1);
         user.setEmail(email);
         user.setMatrikelnummer(mtnr);
-        user.setPassword(user.getPassword());
         user.setNachname(user.getNachname());
         user.setName(user.getName());
         user.setType(user.getType());
         user.setAuthProvider(user.getAuthProvider());
+
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
 
 
         userRepository.save(user);
@@ -317,14 +318,12 @@ public class UserController {
         user.setNachname(lastname);
         user.setName(firstname);
         user.setPassword(UUID.randomUUID().toString());
-        user.setType("Student");
 
         List<Authority> myauthorities = new ArrayList<Authority>();
         myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
         user.setMyauthorities(myauthorities);
         user.setAuthProvider(AuthenticationProvider.GOOGLE);
         user.setActive(0);
-
 
         userRepository.save(user);
 
@@ -340,27 +339,37 @@ public class UserController {
         CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
         String email = oauthUser.getEmail();
 
-        Integer user1 = getuser.getMatrikelnummer();
-        Optional<User> user = userRepository.findUserByEmail(email);
+        Integer responseMatrikelnummer = getuser.getMatrikelnummer();
+        String responseType = getuser.getType();
+        Optional<User> userByEmail = userRepository.findUserByEmail(email);
+        Optional<User> userById = userRepository.findById(id);
 
-        mv.addObject("matrikelnummer", user.get().getMatrikelnummer());
 
-        if (user.isPresent()) {
+        if (userByEmail.isPresent() && userById.isPresent()) {
+
+
             List<Authority> myauthorities = new ArrayList<Authority>();
             myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
-            user.get().setMyauthorities(myauthorities);
-            user.get().setActive(1);
-            mv.addObject("matrikelnummer", user.get().getMatrikelnummer());
-            user.get().setMatrikelnummer(user1);
+            userByEmail.get().setMyauthorities(myauthorities);
+            userByEmail.get().setActive(1);
 
+            if (responseMatrikelnummer != null && !responseType.isEmpty()) {
+                userByEmail.get().setMatrikelnummer(responseMatrikelnummer);
+                userByEmail.get().setType(responseType);
 
-            userRepository.save(user.get());
+                userRepository.save(userByEmail.get());
 
-            studentProfessor.setUser(user.get());
-            studentProfessor.setMatrikelnummer(user.get().getMatrikelnummer());
-            studentProfessorRepository.save(studentProfessor);
+                studentProfessor.setUser(userByEmail.get());
+                studentProfessor.setMatrikelnummer(userByEmail.get().getMatrikelnummer());
+                studentProfessorRepository.save(studentProfessor);
+            }
+            if (responseMatrikelnummer == null && responseType.isEmpty()) {
+                mv.setViewName("redirect:/home");
+                return mv;
+            }
+
         }
-
+        mv.addObject("matrikelnummer", userByEmail.get().getMatrikelnummer());
         mv.setViewName("verwalten/martikelnummer-added");
         return mv;
 

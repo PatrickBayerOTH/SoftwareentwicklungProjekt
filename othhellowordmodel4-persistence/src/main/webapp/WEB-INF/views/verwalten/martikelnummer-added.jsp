@@ -19,8 +19,10 @@
 <br>
 
 <br>
+
 <div>
-    <button type="button" class="alert alert-primary"><a href="/login">Login</a></button>
+    <a class="btn btn-outline-primary ui-state-active" type="button" href="/login"
+       role="button">Login</a>
 </div>
 
 </body>

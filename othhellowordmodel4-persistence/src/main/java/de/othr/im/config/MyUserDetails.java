@@ -27,21 +27,20 @@ public class MyUserDetails implements UserDetails {
 
         this.email = user.getEmail();
         this.password = user.getPassword();
-        System.out.println("password of the user is=" + this.password);
-        System.out.println("email of the user is=" + this.email);
+        //System.out.println("password of the user is=" + this.password);
+        //System.out.println("email of the user is=" + this.email);
         this.active = (user.getActive() > 0) ? true : false;
 
 
         List<Authority> myauthorities = (List<Authority>) user.getMyauthorities();
 
-        System.out.println("the user " + user.getEmail() + " has " +
-                myauthorities.size() + " authorities");
+        //System.out.println("the user " + user.getEmail() + " has " + myauthorities.size() + " authorities");
 
         authorities = new ArrayList<>();
 
         for (int i = 0; i < myauthorities.size(); i++) {
             authorities.add(new SimpleGrantedAuthority(myauthorities.get(i).getDescription().toUpperCase()));
-            System.out.println("the profile" + i + " of " + user.getEmail() + " is " + myauthorities.get(0).getDescription());
+            //System.out.println("the profile" + i + " of " + user.getEmail() + " is " + myauthorities.get(0).getDescription());
         }
     }
 

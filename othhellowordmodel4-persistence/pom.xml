@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>de.othr.im</groupId>
-    <artifactId>othhellowordmodel3</artifactId>
+    <artifactId>UNIPAY</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>othhellowordmodel2-1</name>
-    <description>Demo project for Spring Boot</description>
+    <name>UNIPAY</name>
+    <description>UNIPAY project for Spring Boot</description>
     <properties>
         <java.version>11</java.version>
     </properties>
