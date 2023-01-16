@@ -542,7 +542,6 @@ public class HomeController {
         if(account.isEmpty()) {
             return null;
         }
-
         //get inbound Transactions
         List<MoneyTransfer> transfers = transferRepository.findByTo(account.get().getId());
         //get outbound Transactions
@@ -563,6 +562,7 @@ public class HomeController {
         }
         return "";
     }
+
 
     @GetMapping("/mainpage")
 	public String mainpage(Model model) {

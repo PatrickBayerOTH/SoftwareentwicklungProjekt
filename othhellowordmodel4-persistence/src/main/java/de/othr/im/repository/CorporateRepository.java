@@ -11,4 +11,6 @@ public interface CorporateRepository extends JpaRepository<Corporate, Long> {
     Optional<Corporate> findByName(String name);
 
     Optional<Corporate> findByAccount(Long account);
+
+    void deleteById(Long id);
 }
