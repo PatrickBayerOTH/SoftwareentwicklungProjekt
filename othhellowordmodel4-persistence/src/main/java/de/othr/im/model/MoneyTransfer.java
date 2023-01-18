@@ -1,6 +1,5 @@
 package de.othr.im.model;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.*;
@@ -21,37 +20,37 @@ public class MoneyTransfer{// implements Serializable{
 
 
 	@OneToOne(cascade = CascadeType.MERGE)
-	@JoinColumn(name = "from", referencedColumnName = "id")
-	private Account from;
+	@JoinColumn(name = "sender", referencedColumnName = "id")
+	private Account sender;
 	@OneToOne(cascade = CascadeType.MERGE)
-	@JoinColumn(name = "to", referencedColumnName = "id")
-	private Account to;
+	@JoinColumn(name = "receiver", referencedColumnName = "id")
+	private Account receiver;
 	
-	float amount;
+	double amount;
 	Timestamp date;
 
 
-	public Account getFrom() {
-		return from;
+	public Account getSender() {
+		return sender;
 	}
 
-	public void setFrom(Account from) {
-		this.from = from;
+	public void setSender(Account sender) {
+		this.sender = sender;
 	}
 
-	public Account getTo() {
-		return to;
+	public Account getReceiver() {
+		return receiver;
 	}
 
-	public void setTo(Account to) {
-		this.to = to;
+	public void setReceiver(Account receiver) {
+		this.receiver = receiver;
 	}
 
-	public float getAmount() {
+	public double getAmount() {
 		return amount;
 	}
 
-	public void setAmount( float amount) {
+	public void setAmount( double amount) {
 		this.amount=amount;
 	}
 	

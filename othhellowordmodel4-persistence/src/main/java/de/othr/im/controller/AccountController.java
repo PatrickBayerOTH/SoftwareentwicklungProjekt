@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,29 +35,24 @@ public class AccountController {
         List<MoneyTransfer> transfers = getAffiliatedTransactions(user);
         List<String> sender = new ArrayList<String>(), receiver = new ArrayList<String>();
         for(MoneyTransfer m : transfers) {
-            sender.add(convertName(m.getFrom()));
-            receiver.add(convertName(m.getTo()));
+            sender.add(convertName(m.getSender()));
+            receiver.add(convertName(m.getReceiver()));
         }
         model.addAttribute("transfers", transfers);
         model.addAttribute("sender", sender);
         model.addAttribute("receiver", receiver);
-        return new ModelAndView("/account/account.jsp");
+        return new ModelAndView("/account/account");
     }
 
     private List<MoneyTransfer> getAffiliatedTransactions(StudentProfessor user) {
-        //get the account related to the user
-        //Optional<StudentProfessor> studentProfessor = studentProfessorRepository.findStudentByIdUser(user.getId());
-        //if(studentProfessor.isEmpty()) {
-        //    return null;
-        //}
         Optional<Account> account = accountRepository.findById(user.getAccount().getId());
         if(account.isEmpty()) {
-            return null;
+            return new ArrayList<MoneyTransfer>();
         }
         //get inbound Transactions
-        List<MoneyTransfer> transfers = transferRepository.findByTo(account.get().getId());
+        List<MoneyTransfer> transfers = transferRepository.findByReceiver(account.get().getId());
         //get outbound Transactions
-        transfers.addAll(transferRepository.findByFrom(account.get().getId()));
+        transfers.addAll(transferRepository.findBySender(account.get().getId()));
         return transfers;
     }
 

@@ -136,6 +136,7 @@ public class UserController {
 
             studentProfessor.setMatrikelnummer(user.getMatrikelnummer());
             studentProfessor.setUser(user);
+            studentProfessor.setAccount(new Account());
             studentProfessorRepository.save(studentProfessor);
 
 

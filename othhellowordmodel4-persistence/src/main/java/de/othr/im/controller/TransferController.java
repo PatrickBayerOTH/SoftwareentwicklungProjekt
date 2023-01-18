@@ -25,7 +25,7 @@ public class TransferController {
     @Autowired
     CorporateRepository corporateRepository;
 
-    @PostMapping("/account/{accountId")
+    @PostMapping("/account/{accountId}")
     public void createAccount(@PathVariable Long accountId, @RequestBody Account createAccount) {
         throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED);
     }
@@ -52,7 +52,7 @@ public class TransferController {
         accountRepository.save(editAccount);
     }
 
-    @DeleteMapping("/account/{accountId")
+    @DeleteMapping("/account/{accountId}")
     public void deleteAccount(@PathVariable Long accountId) {
         Optional<Account> account = accountRepository.findById(accountId);
         if(account.isPresent()) {
@@ -102,7 +102,7 @@ public class TransferController {
     @PostMapping("/corp")
     public void createCorporation(@RequestBody CorporateOut createCorporation) {
         Corporate corporate = new Corporate();
-        corporate.setId(createCorporation.getId());
+        //corporate.setId(createCorporation.getId());
         corporate.setName(createCorporation.getName());
         Account account = new Account();
         account.setValue(createCorporation.getValue());
@@ -134,7 +134,7 @@ public class TransferController {
         corporateRepository.save(editcorporate);
     }
 
-    @DeleteMapping("/corp/{corporateId")
+    @DeleteMapping("/corp/{corporateId}")
     public void deleteCorporation(@PathVariable Long corporateId) {
         Optional<Corporate> corporate = corporateRepository.findById(corporateId);
         if(corporate.isPresent()) {
@@ -205,9 +205,9 @@ public class TransferController {
         accountRepository.save(receiverAccount);
         //create transfer entry
         MoneyTransfer transfer = new MoneyTransfer();
-        transfer.setAmount((float)transferForm.getValue());
-        transfer.setFrom(senderAccount);
-        transfer.setTo(receiverAccount);
+        transfer.setAmount((double)transferForm.getValue());
+        transfer.setSender(senderAccount);
+        transfer.setReceiver(receiverAccount);
         transfer.setDate(new Timestamp(System.currentTimeMillis()));
 
         transferRepository.save(transfer);

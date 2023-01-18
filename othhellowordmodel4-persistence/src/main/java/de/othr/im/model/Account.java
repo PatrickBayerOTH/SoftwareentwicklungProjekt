@@ -11,7 +11,7 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "value")
+    @Column(name = "value", columnDefinition = "double default 0")
     private double value;
 
     public Long getId() {
