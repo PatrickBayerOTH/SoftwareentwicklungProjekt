@@ -111,36 +111,35 @@
                     </div>
 
                     <div class="table-responsive-md mt-3">
-                        <table class="table table-striped table-hover display">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">Id</th>
+                                <table class="table table-striped table-hover display">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">Sender</th>
+                                            <th class="text-center">Receiver</th>
+                                            <th class="text-center">Amount</th>
+                                            <th class="text-center">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <c:forEach var="transaction" items="${transactions}" varStatus="index">
+                                        <tr>
+                                            <td>
+                                            ${sender[index.index]}
+                                            </td>
+                                            <td>
+                                            ${receiver[index.index]}
+                                            </td>
+                                            <td>
+                                            ${transaction.amount}
+                                            </td>
+                                            <td>
+                                            ${transaction.date}
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
 
-                                </tr>
-                            </thead>
 
-                            <c:forEach var="transaction" items="${transactions}" varStatus="status">
-                                <tr>
-                                    <td>
-                                    ${sender[status.index]}
-                                    </td>
-
-                                    <td>${receiver[status.index]}
-
-
-                                    </td>
-                                    <td>${transaction.amount}
-
-
-                                    </td>
-                                    <td>${transaction.date}
-
-                                    </td>
-                                    <td class="text-center ">
-                                </tr>
-                            </c:forEach>
-                        </table>
-                    </div>
+                                </table>
+                            </div>
                     <div class="product-device shadow-sm d-none d-md-block"></div>
                     <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
                 </div>
@@ -178,29 +177,35 @@
                         </div>
 
                         <div class="table-responsive-md mt-3">
-                            <table class="table table-striped table-hover display">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center">Id</th>
+                                    <table class="table table-striped table-hover display">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">Sender</th>
+                                                <th class="text-center">Receiver</th>
+                                                <th class="text-center">Amount</th>
+                                                <th class="text-center">Date</th>
+                                            </tr>
+                                        </thead>
+                                        <c:forEach var="transaction" items="${transactions}" varStatus="index">
+                                            <tr>
+                                                <td>
+                                                ${sender[index.index]}
+                                                </td>
+                                                <td>
+                                                ${receiver[index.index]}
+                                                </td>
+                                                <td>
+                                                ${transaction.amount}
+                                                </td>
+                                                <td>
+                                                ${transaction.date}
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
 
-                                    </tr>
-                                </thead>
-                                <c:forEach var="transaction" items="${transactions}" varStatus="status">
-                                    <tr>
-                                        <td>
-                                        ${sender[status.index]}
-                                        </td>
-                                        <td>${receiver[status.index]}
-                                        </td>
-                                        <td>${transaction.amount}
-                                        </td>
-                                        <td>${transaction.date}
-                                        </td>
-                                        <td class="text-center ">
-                                    </tr>
-                                </c:forEach>
-                            </table>
-                        </div>
+
+                                    </table>
+                                </div>
                         <div class="product-device shadow-sm d-none d-md-block"></div>
                         <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
                     </div>

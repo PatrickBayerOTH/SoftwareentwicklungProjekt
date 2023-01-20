@@ -5,13 +5,17 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import de.othr.im.model.MoneyTransfer;
+import de.othr.im.model.*;
+import org.springframework.data.jpa.repository.Query;
 //import de.othr.im.model.Student;
 
-public interface TransferRepository extends JpaRepository<MoneyTransfer, Long> {
+public interface TransferRepository extends JpaRepository<MoneyTransfer, Account> {
 
-	List<MoneyTransfer> findBySender(Long from);
-	List<MoneyTransfer> findByReceiver(Long to);
+	@Query("select t from MoneyTransfer t where t.sender.id=:sender")
+	List<MoneyTransfer> findBySender(Long sender);
+
+	@Query("select t from MoneyTransfer t where t.receiver.id=:receiver")
+	List<MoneyTransfer> findByReceiver(Long receiver);
 
 	
 	

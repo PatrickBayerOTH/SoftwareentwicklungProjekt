@@ -1,3 +1,5 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <!doctype html>
 <html lang="en">
 
@@ -45,16 +47,19 @@
             <table class="table table-striped table-hover display">
                 <thead>
                     <tr>
-                        <th class="text-center">Id</th>
+                        <th class="text-center">Sender</th>
+                        <th class="text-center">Receiver</th>
+                        <th class="text-center">Amount</th>
+                        <th class="text-center">Date</th>
                     </tr>
                 </thead>
-                <c:forEach var="transaction" items="${transfers}" varStatus="status">
+                <c:forEach var="transaction" items="${transfers}" varStatus="index">
                     <tr>
                         <td>
-                        ${sender[status.index]}
+                        ${sender[index.index]}
                         </td>
                         <td>
-                        ${receiver[status.index]}
+                        ${receiver[index.index]}
                         </td>
                         <td>
                         ${transaction.amount}

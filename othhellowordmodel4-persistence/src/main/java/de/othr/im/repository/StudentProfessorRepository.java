@@ -12,7 +12,7 @@ public interface StudentProfessorRepository extends JpaRepository<StudentProfess
 
     @Query("select s from StudentProfessor s where s.user.id=:iduser")
     Optional<StudentProfessor> findStudentByIdUser(Long iduser);
-
+    @Query("select s from StudentProfessor s where s.account.id=:account")
     Optional<StudentProfessor> findByAccount(Long account);
 
 }

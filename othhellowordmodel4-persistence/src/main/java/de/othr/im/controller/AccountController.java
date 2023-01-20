@@ -30,7 +30,7 @@ public class AccountController {
 
 
     @RequestMapping("/account")
-    public ModelAndView account(Model model, HttpServletRequest request) {
+    public String account(Model model, HttpServletRequest request) {
         StudentProfessor user = (StudentProfessor) request.getSession().getAttribute("studentSession");
         List<MoneyTransfer> transfers = getAffiliatedTransactions(user);
         List<String> sender = new ArrayList<String>(), receiver = new ArrayList<String>();
@@ -41,18 +41,19 @@ public class AccountController {
         model.addAttribute("transfers", transfers);
         model.addAttribute("sender", sender);
         model.addAttribute("receiver", receiver);
-        return new ModelAndView("/account/account");
+        return "/account/account";
     }
 
     private List<MoneyTransfer> getAffiliatedTransactions(StudentProfessor user) {
-        Optional<Account> account = accountRepository.findById(user.getAccount().getId());
-        if(account.isEmpty()) {
-            return new ArrayList<MoneyTransfer>();
+        Optional<Account> accountOptional = accountRepository.findById(user.getAccount().getId());
+        if(accountOptional.isEmpty()) {
+            return null;
         }
+        Account account = accountOptional.get();
         //get inbound Transactions
-        List<MoneyTransfer> transfers = transferRepository.findByReceiver(account.get().getId());
+        List<MoneyTransfer> transfers = transferRepository.findByReceiver(account.getId());
         //get outbound Transactions
-        transfers.addAll(transferRepository.findBySender(account.get().getId()));
+        transfers.addAll(transferRepository.findBySender(account.getId()));
         return transfers;
     }
 

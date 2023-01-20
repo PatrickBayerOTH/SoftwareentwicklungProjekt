@@ -542,14 +542,15 @@ public class HomeController {
 
     private List<MoneyTransfer> getAffiliatedTransactions(StudentProfessor user) {
         //get the account related to the user
-        Optional<Account> account = accountRepository.findById(user.getAccount().getId());
-        if(account.isEmpty()) {
+        Optional<Account> accountOptional = accountRepository.findById(user.getAccount().getId());
+        if(accountOptional.isEmpty()) {
             return null;
         }
+        Account account = accountOptional.get();
         //get inbound Transactions
-        List<MoneyTransfer> transfers = transferRepository.findByReceiver(account.get().getId());
+        List<MoneyTransfer> transfers = transferRepository.findByReceiver(account.getId());
         //get outbound Transactions
-        transfers.addAll(transferRepository.findBySender(account.get().getId()));
+        transfers.addAll(transferRepository.findBySender(account.getId()));
         return transfers;
     }
 
