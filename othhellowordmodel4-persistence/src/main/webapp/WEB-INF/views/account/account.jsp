@@ -1,3 +1,5 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <!doctype html>
 <html lang="en">
 
@@ -5,7 +7,7 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <title>Accountdetails</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
 </head>
 
@@ -36,61 +38,41 @@
                         <a class="nav-link" href="/prelogout">Logout</a>
                     </li>
                 </ul>
-                <ul id="weather" class="navbar-nav ms-auto">
-                    <li>
-                        <span class="navbar-text">
-                            <div class="row">
-                                <div class="col">
-                                    <div class="row">
-                                        Temperatur: ${temp}
-
-                                    </div>
-                                    <div class="row">
-                                        ReelFeal: ${rf}
-
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <img src="${wet}" alt="SVG mit img laden" width="64" height="64">
-
-                                </div>
-                            </div>
-                        </span>
-                    </li>
-                </ul>
-
             </div>
         </nav>
     </header>
 
     <div class="overflow-hidden p-3 p-md-5 m-md-3 bg-light">
+        <div class="table-responsive-md mt-3">
+            <table class="table table-striped table-hover display">
+                <thead>
+                    <tr>
+                        <th class="text-center">Sender</th>
+                        <th class="text-center">Receiver</th>
+                        <th class="text-center">Amount</th>
+                        <th class="text-center">Date</th>
+                    </tr>
+                </thead>
+                <c:forEach var="transaction" items="${transfers}" varStatus="index">
+                    <tr>
+                        <td>
+                        ${sender[index.index]}
+                        </td>
+                        <td>
+                        ${receiver[index.index]}
+                        </td>
+                        <td>
+                        ${transaction.amount}
+                        </td>
+                        <td>
+                        ${transaction.date}
+                        </td>
+                    </tr>
+                </c:forEach>
 
-        <h1 class=" text-start display-4 fw-normal">&Uuml;bersicht</h1>
-        <h3 class=" text-start display-6 fw-normal">Guthaben</h3>
-        <p class="lead fw-normal">And an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple’s marketing pages.And an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple’s marketing pagesAnd an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple’s marketing pages</p>
-        <a class="btn btn-outline-secondary" href="/account">Accountinformationen</a>
 
-        <div class="product-device shadow-sm d-none d-md-block"></div>
-        <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
-    </div>
-    <div class="overflow-hidden p-3 p-md-5 m-md-3 bg-light">
-        <div class="col-md-12">
-            <div class="row ">
-
-                <h1 class=" text-start display-4 fw-normal col-md-6">Freunde</h1>
-                <a class="btn btn-primary col-md-3 " href="#" style="padding: 20px;">Freunde suchen</a>
-            </div>
+            </table>
         </div>
-
-
-
-
-
-        <p class="lead fw-normal">And an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple’s marketing pages.And an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple’s marketing pagesAnd an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple’s marketing pages</p>
-        <a class="btn btn-outline-secondary" href="#">Coming soon</a>
-
-        <div class="product-device shadow-sm d-none d-md-block"></div>
-        <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
     </div>
 
 

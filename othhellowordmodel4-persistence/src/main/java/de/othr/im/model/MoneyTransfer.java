@@ -1,14 +1,8 @@
 package de.othr.im.model;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name="transfer")
@@ -22,41 +16,48 @@ public class MoneyTransfer{// implements Serializable{
 	@Id
 	@GeneratedValue (strategy = GenerationType.IDENTITY)
 	Long id;
+
+
+
+	@OneToOne(cascade = CascadeType.MERGE)
+	@JoinColumn(name = "sender", referencedColumnName = "id")
+	private Account sender;
+	@OneToOne(cascade = CascadeType.MERGE)
+	@JoinColumn(name = "receiver", referencedColumnName = "id")
+	private Account receiver;
 	
-	@Column(name="`from`")
-	int from;
-	@Column(name="`to`")
-	int to;
-	
-	float amount;
+	double amount;
 	Timestamp date;
 
-	
-	public int getFrom() {
-		return from;
+
+	public Account getSender() {
+		return sender;
 	}
-	public void setFrom( int fromid) {
-		this.from=fromid;
+
+	public void setSender(Account sender) {
+		this.sender = sender;
 	}
-	
-	public int getTo() {
-		return to;
+
+	public Account getReceiver() {
+		return receiver;
 	}
-	public void setTo(int toid) {
-		this.to=toid;
+
+	public void setReceiver(Account receiver) {
+		this.receiver = receiver;
 	}
-	
-	
-	public float getAmount() {
+
+	public double getAmount() {
 		return amount;
 	}
-	public void setAmount( float amount) {
+
+	public void setAmount( double amount) {
 		this.amount=amount;
 	}
 	
 	public Timestamp getDate() {
 		return date;
 	}
+
 	public void setDate( Timestamp date) {
 		this.date=date;
 	}
