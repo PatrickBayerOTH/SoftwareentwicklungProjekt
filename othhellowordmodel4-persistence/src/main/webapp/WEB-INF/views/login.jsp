@@ -13,11 +13,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
 </head>
-
+<body>
 <br><br>
 <h4 class="mt-1 mb-5 pb-1 d-flex justify-content-center">We are The UniPay Team</h4>
 
-<div class="row">
+<div class="text-center">
     <div class="col-md-12">
         <a href="/oauth2/authorization/google"
            class="btn btn btn-lg btn-google btn-block text-uppercase btn-outline "><img
@@ -26,14 +26,15 @@
 </div>
 <br>
 
-<body>
+<p class="text-center">or:</p>
+
 <form action="${loginUrl}" method="post" class="h-100 gradient-form" style="background-color: #eee;">
 
     <div class="mb-3">
         <p>
             <label for="username" class="form-label ">Email</label>
             <input type="text" id="username" name="username" class="form-control" placeholder="Email"/>
-            <small id="emailHelp" class="form-text text-muted">We'll never share your Matrikelnummer with anyone
+            <small id="emailHelp" class="form-text text-muted">We'll never share your Data with anyone
                 else.</small>
         </p>
     </div>
@@ -44,11 +45,20 @@
         </p>
     </div>
 
+    <div class="text-start">
+        <p><a href="user/emailForPassword" target="_blank"
+              class="text-decoration-none">Forgot your password?</a></p>
+    </div>
+
     <button type="submit" class="btn btn-primary">Log in</button>
 
+
     <div class="text-center">
-        <p>Not a member? <a href="user/student/add">Sign Up</a></p>
+        <p>Not a member? <a href="user/student/add" class="text-decoration-none">Sign
+            Up</a></p>
     </div>
+
+
 </form>
 
 </body>

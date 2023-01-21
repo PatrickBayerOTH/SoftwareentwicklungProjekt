@@ -268,6 +268,7 @@ public class UserController {
         Optional<StudentProfessor> optStudent = studentProfessorRepository.findStudentByIdUser(id);
         Optional<User> user = userRepository.findById(id);
 
+
         if (userRepository.existsById(id)) {
             studentProfessorRepository.delete(optStudent.get());
             userRepository.delete(user.get());
