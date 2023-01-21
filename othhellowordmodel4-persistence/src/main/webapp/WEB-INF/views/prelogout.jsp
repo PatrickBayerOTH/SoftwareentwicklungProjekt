@@ -8,6 +8,36 @@
 
 </head>
 <body>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/home">UniPay</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/home">Home </a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="http://localhost:8080/mainpage">&Uuml;bersicht </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="http://localhost:8080/activity">Aktivit&auml;ten</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="http://localhost:8080/friends">Freunde</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/user/accountVerwalten/${studentSession.user.id}">Account Verwalten</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/prelogout">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<br>
 <br>
 <br>
 <div class="alert alert-dark" role="alert">
@@ -18,12 +48,7 @@
     <a href="/login" class="btn btn-outline-warning ui-state-active" type="button"
        role="button">logout</a>
 </div>
-<br>
 
-<div>
-    <a href="/home" class="btn btn-outline-primary ui-state-active" type="button"
-       role="button">Home</a>
-</div>
 
 </body>
 </html>
