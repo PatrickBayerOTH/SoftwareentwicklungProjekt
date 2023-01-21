@@ -57,8 +57,15 @@
                                 <div class="form-group col-sm-1"></div>
                                 <spring:bind path="amount">
                                     <div class="form-group col-sm-8  ${status.error ? 'has-error' : ''}">
-                                        <form:input path="amount" type="number" step="0.01" min="1" max="${kontostand}" class="form-control" id="amount" required="required" />
+                                        <form:input path="amount" type="number" step="0.01" min="1" max="${kontostand}" class="form-control" id="amount" required="required" playeholder="Wie viel möchstest du senden?" />
                                         <form:errors path="amount" class="control-label" />
+
+                                    </div>
+                                </spring:bind>
+                                <spring:bind path="message">
+                                    <div class="form-group col-sm-8  ${status.error ? 'has-error' : ''}">
+                                        <form:input path="message" type="text" class="form-control" id="amount" required="required" placeholder="Du kannst deinem Freund eine Nachricht schicken" />
+                                        <form:errors path="message" class="control-label" />
 
                                     </div>
                                 </spring:bind>
@@ -111,35 +118,41 @@
                     </div>
 
                     <div class="table-responsive-md mt-3">
-                                <table class="table table-striped table-hover display">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center">Sender</th>
-                                            <th class="text-center">Receiver</th>
-                                            <th class="text-center">Amount</th>
-                                            <th class="text-center">Date</th>
-                                        </tr>
-                                    </thead>
-                                    <c:forEach var="transaction" items="${transactions}" varStatus="index">
-                                        <tr>
-                                            <td>
-                                            ${sender[index.index]}
-                                            </td>
-                                            <td>
-                                            ${receiver[index.index]}
-                                            </td>
-                                            <td>
-                                            ${transaction.amount}
-                                            </td>
-                                            <td>
-                                            ${transaction.date}
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
+                        <table class="table table-striped table-hover display">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Sender</th>
+                                    <th class="text-center">Receiver</th>
+                                    <th class="text-center">Amount</th>
+                                    <th class="text-center">Message</th>
+                                    <th class="text-center">Date</th>
+                                </tr>
+                            </thead>
+                            <c:forEach var="transaction" items="${transactions}" varStatus="index">
+                                <tr>
 
 
-                                </table>
-                            </div>
+                                    <td>
+                                        ${sender[index.index]}
+                                    </td>
+                                    <td>
+                                        ${receiver[index.index]}
+                                    </td>
+                                    <td>
+                                        ${transaction.amount}
+                                    </td>
+                                    <td>
+                                        ${transaction.message}
+                                    </td>
+                                    <td>
+                                        ${transaction.date}
+                                    </td>
+                                </tr>
+                            </c:forEach>
+
+
+                        </table>
+                    </div>
                     <div class="product-device shadow-sm d-none d-md-block"></div>
                     <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
                 </div>
@@ -177,35 +190,39 @@
                         </div>
 
                         <div class="table-responsive-md mt-3">
-                                    <table class="table table-striped table-hover display">
-                                        <thead>
-                                            <tr>
-                                                <th class="text-center">Sender</th>
-                                                <th class="text-center">Receiver</th>
-                                                <th class="text-center">Amount</th>
-                                                <th class="text-center">Date</th>
-                                            </tr>
-                                        </thead>
-                                        <c:forEach var="transaction" items="${transactions}" varStatus="index">
-                                            <tr>
-                                                <td>
-                                                ${sender[index.index]}
-                                                </td>
-                                                <td>
-                                                ${receiver[index.index]}
-                                                </td>
-                                                <td>
-                                                ${transaction.amount}
-                                                </td>
-                                                <td>
-                                                ${transaction.date}
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
+                            <table class="table table-striped table-hover display">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Sender</th>
+                                        <th class="text-center">Receiver</th>
+                                        <th class="text-center">Amount</th>
+                                        <th class="text-center">Message</th>
+                                        <th class="text-center">Date</th>
+                                    </tr>
+                                </thead>
+                                <c:forEach var="transaction" items="${transactions}" varStatus="index">
+                                    <tr>
+                                        <td>
+                                            ${sender[index.index]}
+                                        </td>
+                                        <td>
+                                            ${receiver[index.index]}
+                                        </td>
+                                        <td>
+                                            ${transaction.amount}
+                                        </td>
+                                        <td>
+                                            ${transaction.message}
+                                        </td>
+                                        <td>
+                                            ${transaction.date}
+                                        </td>
+                                    </tr>
+                                </c:forEach>
 
 
-                                    </table>
-                                </div>
+                            </table>
+                        </div>
                         <div class="product-device shadow-sm d-none d-md-block"></div>
                         <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
                     </div>

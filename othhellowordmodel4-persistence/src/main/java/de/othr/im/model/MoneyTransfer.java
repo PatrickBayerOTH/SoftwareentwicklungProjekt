@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 
 import javax.persistence.*;
 
+import de.othr.im.util.AttributeEncryptor;
+
 @Entity
 @Table(name="transfer")
 public class MoneyTransfer{// implements Serializable{
@@ -26,8 +28,19 @@ public class MoneyTransfer{// implements Serializable{
 	@JoinColumn(name = "receiver", referencedColumnName = "id")
 	private Account receiver;
 	
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
 	double amount;
 	Timestamp date;
+	@Convert(converter = AttributeEncryptor.class)
+	String message; 
+
 
 
 	public Account getSender() {

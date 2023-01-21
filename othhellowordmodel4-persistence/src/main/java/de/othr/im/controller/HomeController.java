@@ -386,7 +386,7 @@ public class HomeController {
                 transfer.setReceiver(targetStudent.getAccount());
                 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                 transfer.setDate(timestamp);
-
+                
                 transferRepository.save(transfer);
                 studentProfessorRepository.save(targetStudent);
                 studentProfessorRepository.save(currentUser);
