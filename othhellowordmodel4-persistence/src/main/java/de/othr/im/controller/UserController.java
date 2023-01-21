@@ -111,7 +111,6 @@ public class UserController {
         Optional<User> userDB = userRepository.findUserByEmail(studentProfessor.getUser().getEmail());
 
         if (userDB.isPresent()) {
-
             //bindingResult.rejectValue("user.matrikelnummer", "error", "An account already exists for this login.");
             mv.addObject("message", "An account already exists for this login.");
             mv.setViewName("redirect:/user/student/add");
@@ -313,35 +312,45 @@ public class UserController {
     public void processOAuthPostLogin(String email, String firstname, String lastname) {
 
         StudentProfessor studentProfessor = new StudentProfessor();
-        User user = new User();
+        studentProfessor.setUser(new User());
+        studentProfessor.setAccount(new Account());
 
-        user.setEmail(email);
-        user.setNachname(lastname);
-        user.setName(firstname);
-        user.setPassword(UUID.randomUUID().toString());
+
+        studentProfessor.getUser().setEmail(email);
+        studentProfessor.getUser().setNachname(lastname);
+        studentProfessor.getUser().setName(firstname);
+        studentProfessor.getUser().setPassword(UUID.randomUUID().toString());
 
         List<Authority> myauthorities = new ArrayList<Authority>();
         myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
-        user.setMyauthorities(myauthorities);
-        user.setAuthProvider(AuthenticationProvider.GOOGLE);
-        user.setActive(0);
+        studentProfessor.getUser().setMyauthorities(myauthorities);
+        studentProfessor.getUser().setAuthProvider(AuthenticationProvider.GOOGLE);
+        studentProfessor.getUser().setActive(0);
 
-        userRepository.save(user);
+        userRepository.save(studentProfessor.getUser());
 
-        studentProfessor.setUser(user);
+        Account account = studentProfessor.getAccount();
+        studentProfessor.setAccount(account);
+
         studentProfessorRepository.save(studentProfessor);
 
     }
 
 
     @RequestMapping(method = RequestMethod.POST, value = "/matrikelNummer/process/{id}")
-    public ModelAndView updateUserByMatrikelnummer(@ModelAttribute("neuMatrikelnummer") User getuser, StudentProfessor studentProfessor, @PathVariable("id") Long id, Authentication authentication) {
+    public ModelAndView updateUserByMatrikelnummer(@ModelAttribute("neuMatrikelnummer") User getuser, @PathVariable("id") Long id, Authentication authentication) {
+
         ModelAndView mv = new ModelAndView();
+
+        StudentProfessor studentProfessor = studentProfessorRepository.getReferenceById(id);
+
         CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
         String email = oauthUser.getEmail();
 
         Integer responseMatrikelnummer = getuser.getMatrikelnummer();
+
         String responseType = getuser.getType();
+
         Optional<User> userByEmail = userRepository.findUserByEmail(email);
         Optional<User> userById = userRepository.findById(id);
 
@@ -360,8 +369,10 @@ public class UserController {
 
                 userRepository.save(userByEmail.get());
 
+
                 studentProfessor.setUser(userByEmail.get());
                 studentProfessor.setMatrikelnummer(userByEmail.get().getMatrikelnummer());
+
                 studentProfessorRepository.save(studentProfessor);
             }
             if (responseMatrikelnummer == null && responseType.isEmpty()) {

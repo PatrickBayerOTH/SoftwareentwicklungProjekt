@@ -181,7 +181,7 @@ public class TransferController {
         }
     }
 
-    @PostMapping("/transfer")
+   @PostMapping("/transfer")
     public void createTransfer(@RequestBody TransferForm transferForm) {
         //get sender object
         Optional<StudentProfessor> studentProfessor = studentProfessorRepository.findStudentByIdUser(transferForm.getFrom());

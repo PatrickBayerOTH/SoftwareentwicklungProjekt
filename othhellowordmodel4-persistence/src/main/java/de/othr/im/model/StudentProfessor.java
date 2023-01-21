@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "studentProfessor")
-public class StudentProfessor implements Serializable {
+public class StudentProfessor  {
 
     private static final long serialVersionUID = 1L;
 
@@ -17,9 +17,9 @@ public class StudentProfessor implements Serializable {
     @Column(unique = true)
     private Integer matrikelnummer;
 
-    @OneToOne(cascade = CascadeType.MERGE)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "accountid", referencedColumnName = "id")
-    private Account account;
+    Account account;
 
     @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "iduser", referencedColumnName = "id")

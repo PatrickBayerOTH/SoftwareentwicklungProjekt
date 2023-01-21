@@ -14,6 +14,7 @@ public class Account {
     @Column(name = "value", columnDefinition = "double default 0")
     private double value;
 
+
     public Long getId() {
         return id;
     }
@@ -29,6 +30,10 @@ public class Account {
     public void setValue(double value) {
         this.value = value;
     }
+
+
+
+
 
 
 
