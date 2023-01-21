@@ -17,6 +17,8 @@ public interface ConfirmationTokenRepository extends CrudRepository<Confirmation
 
     ConfirmationToken findByConfirmationToken(String confirmationToken);
 
+    @Query("select c from ConfirmationToken c where c.user.id=:iduser")
+    Optional<ConfirmationToken> findStudentByIdUser(Long iduser);
 
 }
 

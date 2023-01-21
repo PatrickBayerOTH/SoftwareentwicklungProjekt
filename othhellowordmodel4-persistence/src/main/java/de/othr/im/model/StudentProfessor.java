@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "studentProfessor")
-public class StudentProfessor  {
+public class StudentProfessor implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

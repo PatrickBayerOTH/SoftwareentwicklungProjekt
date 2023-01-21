@@ -38,9 +38,9 @@
                 <a class="nav-link" href="http://localhost:8080/friends">Freunde</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="user/accountVerwalten/${studentSession.user.id}">Account Verwalten</a>
+                <a class="nav-link" href="/user/accountVerwalten/${studentSession.user.id}">Account Verwalten</a>
             </li>
-            <li class="nav-item ">
+            <li class="nav-item">
                 <a class="nav-link" href="/prelogout">Logout</a>
             </li>
         </ul>
@@ -53,18 +53,16 @@
     <h4 class="mt-1 mb-2 pb-1">Profile STUDENT - ${studentSession.user.name} ${studentSession.user.nachname} </h4>
 </div>
 
-<br>
-<h4 class="mt-1 mb-5 pb-1">
-    Welcome, ${studentSession.user.name}!
-</h4>
-
 
 <div>
-    <a href="/user/accountVerwalten/${studentSession.user.id}" class="btn btn-outline-primary ui-state-active" type="button"
-       role="button">Konto Verwalten</a>
+    <a href="/user/all/${studentSession.user.id}" class="btn btn-outline-primary ui-state-active" type="button"
+       role="button">Daten Aktualisieren</a>
 </div>
 <br>
-
+<div>
+    <a href="/user/student/delete" class="btn btn-outline-danger ui-state-active" type="button" role="button">Account
+        Löschen</a>
+</div>
 
 
 </body>

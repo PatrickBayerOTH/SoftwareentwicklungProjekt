@@ -21,6 +21,9 @@
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
+                        <a class="nav-link" href="home">Home </a>
+                    </li>
+                    <li class="nav-item active">
                         <a class="nav-link" href="http://localhost:8080/mainpage">&Uuml;bersicht </a>
                     </li>
                     <li class="nav-item">

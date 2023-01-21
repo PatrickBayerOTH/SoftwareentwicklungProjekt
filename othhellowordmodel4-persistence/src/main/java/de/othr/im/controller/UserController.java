@@ -256,7 +256,6 @@ public class UserController {
         }
     }
 
-
     @RequestMapping(value = "/update/{id}")
     public ModelAndView update1(@PathVariable("id") Long iduser) {
 
@@ -280,8 +279,6 @@ public class UserController {
             mv.setViewName("/error");
             return mv;
         }
-
-
     }
 
     @RequestMapping(value = "/update/process", method = RequestMethod.POST)
@@ -317,14 +314,12 @@ public class UserController {
         return mv;
     }
 
-
     @GetMapping("/student/delete")
     public ModelAndView deleteUser() {
 
         ModelAndView mv = new ModelAndView();
         mv.setViewName("/verwalten/student-delete");
         return mv;
-
     }
 
     @RequestMapping(value = "/delete/{id}")
@@ -333,11 +328,14 @@ public class UserController {
         ModelAndView mv = new ModelAndView();
         Optional<StudentProfessor> optStudent = studentProfessorRepository.findStudentByIdUser(id);
         Optional<User> user = userRepository.findById(id);
-
+        Optional<ConfirmationToken> confirmationToken = confirmationTokenRepository.findStudentByIdUser(id);
 
         if (userRepository.existsById(id)) {
             studentProfessorRepository.delete(optStudent.get());
             userRepository.delete(user.get());
+            if (confirmationToken.isPresent()) {
+                confirmationTokenRepository.delete(confirmationToken.get());
+            }
             model.addAttribute("msgs", "Schade, dass du nicht mehr bei uns bist!");
             mv.setViewName("/verwalten/student-deleted");
         } else {
@@ -452,6 +450,15 @@ public class UserController {
         mv.setViewName("verwalten/martikelnummer-added");
         return mv;
 
+    }
+
+    @GetMapping("/accountVerwalten/{id}")
+    public ModelAndView accountVerwalten(@PathVariable("id") Long id) {
+
+        ModelAndView mv = new ModelAndView();
+        Optional<User> user = userRepository.findById(id);
+        mv.setViewName("/verwalten/account-verwalten");
+        return mv;
     }
 
 }
