@@ -153,7 +153,73 @@ public class UserController {
 
     }
 
-    // Email mit Link senden
+    @RequestMapping(value = "/emailForPassword", method = RequestMethod.GET)
+    private ModelAndView passwordEmailEingabe(User user) {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("neuPassword", user);
+        mv.setViewName("verwalten/password");
+        return mv;
+    }
+
+    // Password: Email mit Link senden
+    @RequestMapping(value = "/email-sender-password")
+    private ModelAndView emailSenderPassword(@ModelAttribute("neuPassword") User user, Model model) {
+        ModelAndView mv = new ModelAndView();
+
+        String email = user.getEmail();
+        Optional<User> userDb = userRepository.findUserByEmail(email);
+
+        if (userDb.isPresent()) {
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            mailMessage.setTo(email);
+            mailMessage.setSubject("Password zurücksetzen!");
+            mailMessage.setText("To reset your Password, please click here : "
+                    + "http://localhost:8080/user/resetPassword?email=" + user.getEmail());
+
+            javaMailSender.send(mailMessage);
+
+            mv.setViewName("verwalten/checkEmailForPassword");
+        } else {
+            mv.setViewName("error-email");
+        }
+        return mv;
+    }
+
+    @RequestMapping(value = "/resetPassword", method = RequestMethod.GET)
+    private ModelAndView restPassword(@RequestParam("email") String email, User user) {
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("neuPasswordEingabe", user);
+        mv.setViewName("verwalten/neuPassword");
+
+        return mv;
+    }
+
+    @RequestMapping(value = "/resetPasswordDone/{email}", method = {RequestMethod.GET, RequestMethod.POST})
+    private ModelAndView restPassword(@ModelAttribute("neuPasswordEingabe") User user, @PathVariable("email") String email) {
+
+        ModelAndView mv = new ModelAndView();
+
+        Optional<User> userDb = userRepository.findUserByEmail(email);
+
+        if (!user.getPassword().isEmpty() && userDb.isPresent()) {
+
+            String neuPassword = user.getPassword();
+
+            String encodedPassword = passwordEncoder.encode(neuPassword);
+
+            userDb.get().setPassword(encodedPassword);
+
+            userRepository.save(userDb.get());
+            mv.setViewName("verwalten/Password-done");
+        } else {
+            mv.addObject("message", "The link is invalid or broken!");
+            mv.setViewName("error");
+        }
+        return mv;
+    }
+
+    // Email nach Anmeldung mit Link senden
     @RequestMapping(value = "/email-sender")
     private void emailSender(User user) {
 
@@ -170,7 +236,7 @@ public class UserController {
 
     }
 
-    // Wenn User aufm Link klickt
+    // Wenn User aufm Link klickt zum verifizieren
     @RequestMapping(value = "/confirm-account", method = {RequestMethod.GET, RequestMethod.POST})
     public ModelAndView confirmUserAccount(@RequestParam("token") String confirmationToken) {
 
