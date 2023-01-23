@@ -44,6 +44,29 @@
                 <a class="nav-link" href="/prelogout">Logout</a>
             </li>
         </ul>
+        <ul id="weather" class="navbar-nav ms-auto">
+            <li>
+                    <span class="navbar-text">
+                        <div class="row">
+                            <div class="col">
+                                <div class="row">
+                                    Temperatur: ${temp}
+
+                                </div>
+                                <div class="row">
+                                    ReelFeal: ${rf}
+
+                                </div>
+                            </div>
+                            <div class="col">
+                                <img src="${wet}" alt="SVG mit img laden" width="64" height="64">
+
+                            </div>
+                        </div>
+                    </span>
+            </li>
+        </ul>
+
     </div>
 </nav>
 <br><br><br><br>
