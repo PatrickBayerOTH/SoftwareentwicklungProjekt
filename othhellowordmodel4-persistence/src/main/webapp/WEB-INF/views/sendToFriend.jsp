@@ -25,6 +25,9 @@
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
+                        <a class="nav-link" href="home">Home </a>
+                    </li>
+                    <li class="nav-item active">
                         <a class="nav-link" href="http://localhost:8080/mainpage">&Uuml;bersicht </a>
                     </li>
                     <li class="nav-item">
@@ -32,6 +35,12 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="http://localhost:8080/friends">Freunde</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://localhost:8080/sendMoney">Senden</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="user/accountVerwalten/${studentSession.user.id}">Account Verwalten</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/prelogout">Logout</a>

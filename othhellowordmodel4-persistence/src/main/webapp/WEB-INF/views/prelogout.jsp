@@ -29,20 +29,48 @@
                 <a class="nav-link" href="http://localhost:8080/friends">Freunde</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="http://localhost:8080/sendMoney">Senden</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="/user/accountVerwalten/${studentSession.user.id}">Account Verwalten</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/prelogout">Logout</a>
             </li>
         </ul>
+        <ul id="weather" class="navbar-nav ms-auto">
+            <li>
+                    <span class="navbar-text">
+                        <div class="row">
+                            <div class="col">
+                                <div class="row">
+                                    Temperatur: ${temp}
+
+                                </div>
+                                <div class="row">
+                                    ReelFeal: ${rf}
+
+                                </div>
+                            </div>
+                            <div class="col">
+                                <img src="${wet}" alt="SVG mit img laden" width="64" height="64">
+
+                            </div>
+                        </div>
+                    </span>
+            </li>
+        </ul>
+
     </div>
 </nav>
 <br>
 <br>
 <br>
-<div class="alert alert-dark" role="alert">
+<br>
+
+<p class="alert alert-dark" role="alert">
     Are you sure you want to leave?
-</div>
+</p>
 <br>
 <div>
     <a href="/login" class="btn btn-outline-warning ui-state-active" type="button"

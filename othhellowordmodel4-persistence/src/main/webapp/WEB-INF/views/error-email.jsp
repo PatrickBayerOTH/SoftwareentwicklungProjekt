@@ -19,7 +19,7 @@
 <hr>
 
 <div class="alert alert-danger" role="alert">
-    Error, Bitte geben Sie eine gültige OTH Email-Adresse oder mit der Email existiert schon ein Account.
+    Error, Bitte geben Sie eine gültige OTH Email-Adresse oder mit der Angabe existiert schon ein Account.
 </div>
 
 <br>

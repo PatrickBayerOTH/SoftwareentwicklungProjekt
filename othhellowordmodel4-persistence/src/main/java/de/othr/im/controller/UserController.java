@@ -36,6 +36,9 @@ public class UserController {
     UserRepository userRepository;
 
     @Autowired
+    AccountRepository accountRepository;
+
+    @Autowired
     private JavaMailSender javaMailSender;
 
     @Autowired
@@ -110,8 +113,8 @@ public class UserController {
 
         Optional<User> userDB = userRepository.findUserByEmail(studentProfessor.getUser().getEmail());
 
+
         if (userDB.isPresent()) {
-            //bindingResult.rejectValue("user.matrikelnummer", "error", "An account already exists for this login.");
             mv.addObject("message", "An account already exists for this login.");
             mv.setViewName("redirect:/user/student/add");
             return mv;
@@ -145,11 +148,10 @@ public class UserController {
 
             this.emailSender(user);
 
-            return mv;
         } else {
-            mv.setViewName("/error");
-            return mv;
+            mv.setViewName("/error-email");
         }
+        return mv;
 
     }
 
@@ -233,12 +235,23 @@ public class UserController {
                 + "http://localhost:8080/user/confirm-account?token=" + confirmationToken.getConfirmationToken());
 
         javaMailSender.send(mailMessage);
+    }
+
+    // Email senden nach löschen des Accounts
+    @RequestMapping(value = "/email-sender-by-delete")
+    private void emailSenderByDeleteAccount(User user) {
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setSubject("Complete Löschen!");
+        mailMessage.setText("Ihr account unter der Email " + user.getEmail() + " wurde vom System gelöscht");
+        javaMailSender.send(mailMessage);
 
     }
 
     // Wenn User aufm Link klickt zum verifizieren
     @RequestMapping(value = "/confirm-account", method = {RequestMethod.GET, RequestMethod.POST})
-    public ModelAndView confirmUserAccount(@RequestParam("token") String confirmationToken) {
+    private ModelAndView confirmUserAccount(@RequestParam("token") String confirmationToken) {
 
         ModelAndView mv = new ModelAndView();
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
@@ -329,15 +342,20 @@ public class UserController {
         Optional<StudentProfessor> optStudent = studentProfessorRepository.findStudentByIdUser(id);
         Optional<User> user = userRepository.findById(id);
         Optional<ConfirmationToken> confirmationToken = confirmationTokenRepository.findStudentByIdUser(id);
+        Optional<Account> account = accountRepository.findById(id);
+
 
         if (userRepository.existsById(id)) {
             studentProfessorRepository.delete(optStudent.get());
             userRepository.delete(user.get());
+            accountRepository.delete(account.get());
+
             if (confirmationToken.isPresent()) {
                 confirmationTokenRepository.delete(confirmationToken.get());
             }
             model.addAttribute("msgs", "Schade, dass du nicht mehr bei uns bist!");
             mv.setViewName("/verwalten/student-deleted");
+            emailSenderByDeleteAccount(user.get());
         } else {
             model.addAttribute("errors", "Event not found!");
             mv.setViewName("redirect:/home");

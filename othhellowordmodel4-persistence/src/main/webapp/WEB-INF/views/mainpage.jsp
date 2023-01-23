@@ -36,6 +36,9 @@
                         <a class="nav-link" href="http://localhost:8080/sendMoney">Senden</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="user/accountVerwalten/${studentSession.user.id}">Account Verwalten</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="/prelogout">Logout</a>
                     </li>
                 </ul>
@@ -70,7 +73,7 @@
 
         <h1 class=" text-start display-4 fw-normal">&Uuml;bersicht</h1>
         <h3 class=" text-start display-6 fw-normal">Guthaben</h3>
-        <p class="lead fw-normal">And an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple’s marketing pages.And an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple’s marketing pagesAnd an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple’s marketing pages</p>
+        <p class="lead fw-normal">And an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple's marketing pages.And an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple's marketing pagesAnd an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple's marketing pages</p>
         <a class="btn btn-outline-secondary" href="/account">Accountinformationen</a>
 
         <div class="product-device shadow-sm d-none d-md-block"></div>
@@ -89,7 +92,7 @@
 
 
 
-        <p class="lead fw-normal">And an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple’s marketing pages.And an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple’s marketing pagesAnd an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple’s marketing pages</p>
+        <p class="lead fw-normal">And an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple's marketing pages.And an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple's marketing pagesAnd an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple's marketing pages</p>
         <a class="btn btn-outline-secondary" href="#">Coming soon</a>
 
         <div class="product-device shadow-sm d-none d-md-block"></div>

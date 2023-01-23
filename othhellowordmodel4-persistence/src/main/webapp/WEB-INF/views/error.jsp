@@ -22,17 +22,6 @@
     Error, Diese Ausführung ist nicht erlaubt
 </div>
 
-
-<div>
-    ${errors}
-</div>
-
-
-<br>
-<div>
-    <a href="/home" class="btn btn-outline-primary ui-state-active" type="button"
-       role="button">Home</a></div>
-<br>
 <div>
     <a href="/login" class="btn btn-outline-primary ui-state-active" type="button"
        role="button">Login</a>
