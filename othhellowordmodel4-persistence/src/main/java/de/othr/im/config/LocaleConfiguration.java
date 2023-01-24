@@ -35,7 +35,7 @@ public class LocaleConfiguration implements WebMvcConfigurer {
         ResourceBundleMessageSource source = new ResourceBundleMessageSource();
         //source.setBasename("messages");
         source.setDefaultEncoding("UTF-8");
-        source.setDefaultLocale(Locale.GERMAN);
+        //source.setDefaultLocale(Locale.GERMAN);
         return source;
     }
 
