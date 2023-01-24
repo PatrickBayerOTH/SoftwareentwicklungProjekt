@@ -79,7 +79,7 @@ public class UserController {
         }
 
         if (studentProfessor.getUser().getEmail().isEmpty() || studentProfessor.getUser().getType().isEmpty() || studentProfessor.getUser().getName().isEmpty()
-                || studentProfessor.getUser().getNachname().isEmpty() || studentProfessor.getUser().getPassword().isEmpty() || studentProfessor.getUser().getMatrikelnummer() == null ) {
+                || studentProfessor.getUser().getNachname().isEmpty() || studentProfessor.getUser().getPassword().isEmpty() || studentProfessor.getUser().getMatrikelnummer() == null) {
 
             mv.setViewName("/verwalten/student-add");
             mv.setViewName("redirect:/user/student/add");
@@ -426,12 +426,16 @@ public class UserController {
 
         String responseType = getuser.getType();
 
+        Optional<User> userDbToMtnr = userRepository.findUserMtnr(responseMatrikelnummer);
         Optional<User> userByEmail = userRepository.findUserByEmail(email);
         Optional<User> userById = userRepository.findById(id);
 
+        if (userDbToMtnr.isPresent()) {
+            mv.setViewName("/error-email");
+            return mv;
+        }
 
         if (userByEmail.isPresent() && userById.isPresent()) {
-
 
             List<Authority> myauthorities = new ArrayList<Authority>();
             myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
@@ -450,7 +454,8 @@ public class UserController {
 
                 studentProfessorRepository.save(studentProfessor);
             }
-            if (responseMatrikelnummer == null && responseType.isEmpty()) {
+
+            if (responseMatrikelnummer == null || responseType.isEmpty()) {
                 mv.setViewName("redirect:/home");
                 return mv;
             }
