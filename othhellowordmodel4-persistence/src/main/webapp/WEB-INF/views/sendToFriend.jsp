@@ -9,93 +9,92 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <title><spring:message code="send_friend.title"></spring:message></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
 </head>
 
 <body>
 
-    <header>
-        <!-- Fixed navbar -->
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-            <a class="navbar-brand" href="/home">UniPay</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarCollapse">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="home">Home </a>
-                    </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="http://localhost:8080/mainpage">&Uuml;bersicht </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="http://localhost:8080/activity">Aktivit&auml;ten</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="http://localhost:8080/friends">Freunde</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="http://localhost:8080/sendMoney">Senden</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="user/accountVerwalten/${studentSession.user.id}">Account Verwalten</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/prelogout">Logout</a>
-                    </li>
-                </ul>
-                <ul id="weather" class="navbar-nav ms-auto">
-                    <li>
-                        <span class="navbar-text">
-                            <div class="row">
-                                <div class="col">
-                                    <div class="row">
-                                        Temperatur: ${temp}
+<header>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="/home"><spring:message code="navbar.head"></spring:message></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="home"><spring:message code="navbar.home"></spring:message></a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="http://localhost:8080/mainpage"><spring:message code="navbar.mainpage"></spring:message></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://localhost:8080/activity"><spring:message code="navbar.activities"></spring:message></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://localhost:8080/friends"><spring:message code="navbar.friends"></spring:message></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://localhost:8080/sendMoney"><spring:message code="navbar.send"></spring:message></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="user/accountVerwalten/${studentSession.user.id}"><spring:message code="navbar.account"></spring:message></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/prelogout"><spring:message code="navbar.logout"></spring:message></a>
+                </li>
+            </ul>
+            <ul id="weather" class="navbar-nav ms-auto">
+                <li>
+                    <span class="navbar-text">
+                        <div class="row">
+                            <div class="col">
+                                <div class="row">
+                                    <spring:message code="navbar.weather.temp"></spring:message>: ${temp}
 
-                                    </div>
-                                    <div class="row">
-                                        ReelFeal: ${rf}
-
-                                    </div>
                                 </div>
-                                <div class="col">
-                                    <img src="${wet}" alt="SVG mit img laden" width="64" height="64">
+                                <div class="row">
+                                    <spring:message code="navbar.weather.feel"></spring:message>: ${rf}
 
                                 </div>
                             </div>
-                        </span>
-                    </li>
-                </ul>
+                            <div class="col">
+                                <img src="${wet}" alt="SVG mit img laden" width="64" height="64">
 
-            </div>
-        </nav>
-    </header>
+                            </div>
+                        </div>
+                    </span>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
+</header>
 
     <div id="main">
         <div id="senden" class="overflow-hidden p-3 p-md-5 m-md-3 bg-light">
             <div class="col-md-12">
                 <div class="row ">
                     <c:if test="${targetfriend eq 'targetfriend'}">
-
-
                         <spring:url value="/sendMoney/${id}" var="selectUrl" />
                         <div class="row">
                             <div class="col">
                                 <form:form class="form-row" modelAttribute="sendForm" action="${selectUrl}">
-
                                     <div class="form-group col-sm-1"></div>
                                     <spring:bind path="amount">
                                         <div class="form-group col-sm-8  ${status.error ? 'has-error' : ''}">
-                                            <form:input path="amount" type="number" step="0.01" min="1" max="${kontostand}" class="form-control" id="amount" required="required" playeholder="Wie viel möchstest du senden?" />
+                                            <spring:message code="send_friend.form.amount" var = "amount"></spring:message>
+                                            <form:input path="amount" type="number" step="0.01" min="1" max="${kontostand}" class="form-control" id="amount" required="required" placeholder="${amount}" />
                                             <form:errors path="amount" class="control-label" />
 
                                         </div>
                                     </spring:bind>
                                     <spring:bind path="message">
                                         <div class="form-group col-sm-8  ${status.error ? 'has-error' : ''}">
-                                            <form:input path="message" type="text" class="form-control" id="amount" required="required" placeholder="Du kannst deinem Freund eine Nachricht schicken" />
+                                            <spring:message code="send_friend.form.message" var ="message"></spring:message>
+                                            <form:input path="message" type="text" class="form-control" id="amount" required="required" placeholder="${message}" />
                                             <form:errors path="message" class="control-label" />
 
                                         </div>
@@ -114,14 +113,14 @@
                                 </form:form>
                             </div>
                             <div class="col">
-                                <h3>Verf&uuml;gbares Guthaben${kontostand}</h3>
+                                <h3><spring:message code="send_friend.form.available"></spring:message>: ${kontostand}</h3>
 
 
                             </div>
                         </div>
                     </c:if>
 
-                    <h1 class=" text-start display-4 fw-normal col-md-6">Geld senden</h1>
+                    <h1 class=" text-start display-4 fw-normal col-md-6"><spring:message code="send_friend.form.head"></spring:message></h1>
 
                 </div>
             </div>
@@ -130,7 +129,7 @@
 
 
 
-            <p class="lead fw-normal">Hier kannst du deinen Freunden Geld senden</p>
+            <p class="lead fw-normal"><spring:message code="send_friend.form.content"></spring:message></p>
 
 
             <div class="product-device shadow-sm d-none d-md-block"></div>
@@ -145,18 +144,18 @@
                 <c:if test="${not empty transactions}">
                     <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
                         <div class="text-center mt-5">
-                            <h5>Deine Transaktionen:</h5>
+                            <h5><spring:message code="send_friend.table.head"></spring:message></h5>
                         </div>
 
                         <div class="table-responsive-md mt-3">
                             <table class="table table-striped table-hover display">
                                 <thead>
                                     <tr>
-                                        <th class="text-center">Sender</th>
-                                        <th class="text-center">Receiver</th>
-                                        <th class="text-center">Amount</th>
-                                        <th class="text-center">Message</th>
-                                        <th class="text-center">Date</th>
+                                        <th class="text-center"><spring:message code="send_friend.table.sender"></spring:message></th>
+                                        <th class="text-center"><spring:message code="send_friend.table.receiver"></spring:message></th>
+                                        <th class="text-center"><spring:message code="send_friend.table.amount"></spring:message></th>
+                                        <th class="text-center"><spring:message code="send_friend.table.message"></spring:message></th>
+                                        <th class="text-center"><spring:message code="send_friend.table.date"></spring:message></th>
                                     </tr>
                                 </thead>
                                 <c:forEach var="transaction" items="${transactions}" varStatus="index">
@@ -209,7 +208,7 @@
                 <c:if test="${empty transactions}">
                     <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
                         <div class="text-center mt-5">
-                            <h5>Du hast noch niemandem Geld gesendet </h5>
+                            <h5><spring:message code="send_friend.notable.head"></spring:message> </h5>
                         </div>
                         <div class="product-device shadow-sm d-none d-md-block"></div>
                         <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
@@ -231,19 +230,19 @@
                     <c:if test="${not empty transactions}">
                         <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
                             <div class="text-center mt-5">
-                                <h5>Deine Transaktionen:</h5>
+                                <h5><spring:message code="send_friend.table.head"></spring:message></h5>
                             </div>
 
                             <div class="table-responsive-md mt-3">
                                 <table class="table table-striped table-hover display">
                                     <thead>
                                         <tr>
-                                            <th class="text-center">Direction</th>
-                                            <th class="text-center">Sender</th>
-                                            <th class="text-center">Receiver</th>
-                                            <th class="text-center">Amount</th>
-                                            <th class="text-center">Message</th>
-                                            <th class="text-center">Date</th>
+                                            <th class="text-center"><spring:message code="send_friend.table.direction"></spring:message></th>
+                                            <th class="text-center"><spring:message code="send_friend.table.sender"></spring:message></th>
+                                            <th class="text-center"><spring:message code="send_friend.table.receiver"></spring:message></th>
+                                            <th class="text-center"><spring:message code="send_friend.table.amount"></spring:message></th>
+                                            <th class="text-center"><spring:message code="send_friend.table.message"></spring:message></th>
+                                            <th class="text-center"><spring:message code="send_friend.table.date"></spring:message></th>
                                         </tr>
                                     </thead>
                                     <c:forEach var="transaction" items="${transactions}" varStatus="index">
@@ -279,33 +278,22 @@
                                             </td>
                                         </tr>
                                     </c:forEach>
-
-
                                 </table>
                             </div>
                             <div class="product-device shadow-sm d-none d-md-block"></div>
                             <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
                         </div>
-
-
-
-
                     </c:if>
                     <c:if test="${empty transactions}">
                         <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
                             <div class="text-center mt-5">
-                                <h5>Du hast noch niemandem Geld gesendet </h5>
+                                <h5><spring:message code="send_friend.notable.head"></spring:message> </h5>
                             </div>
                             <div class="product-device shadow-sm d-none d-md-block"></div>
                             <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
                         </div>
-
-
                     </c:if>
                 </div>
-
-
-
             </c:if>
 
             <c:if test="${not empty currfriends}">
@@ -316,11 +304,11 @@
                         <table class="table table-striped table-hover display">
                             <thead>
                                 <tr>
-                                    <th style="display:none;" class="text-center">Id</th>
-                                    <th class="text-center">Name</th>
-                                    <th class="text-center">Nachname</th>
+                                    <th style="display:none;" class="text-center"><spring:message code="send_friend.table.id"></spring:message></th>
+                                    <th class="text-center"><spring:message code="send_friend.table.name"></spring:message></th>
+                                    <th class="text-center"><spring:message code="send_friend.table.surname"></spring:message></th>
 
-                                    <h5>Bitte w&auml;hle einen Freund dem du Geld senden m&ouml;chtest</h5>
+                                    <h5><spring:message code="send_friend.table.choose"></spring:message></h5>
                                 </tr>
                             </thead>
 
@@ -340,8 +328,6 @@
                                                 <path d="M9.998 5.083 10 5a2 2 0 1 0-3.132 1.65 5.982 5.982 0 0 1 3.13-1.567z" />
                                             </svg>
                                         </button>
-
-
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -352,35 +338,22 @@
                 </div>
             </c:if>
         </c:if>
-
         <c:if test="${empty currfriends}">
             <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
                 <div class="table-responsive-md mt-3">
-                    <h5>F&uuml;ge Freunde hinzu um ihnen Geld senden zu k&ouml;nnen </h5>
+                    <h5><spring:message code="send_friend.notable.nofriends"></spring:message></h5>
                 </div>
-
-
                 <button onclick="location.href='http://localhost:8080/selectFriend'" type="button" class="btn btn-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill-add" viewBox="0 0 16 16">
                         <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0Zm-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                         <path d="M2 13c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4Z" />
                     </svg>
                 </button>
-
-
-
-
-
                 <div class="product-device shadow-sm d-none d-md-block"></div>
                 <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
             </div>
         </c:if>
 
     </div>
-
-
-
-
-
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
 </body>
