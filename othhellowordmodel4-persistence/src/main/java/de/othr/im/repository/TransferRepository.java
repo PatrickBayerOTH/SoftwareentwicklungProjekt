@@ -16,6 +16,9 @@ public interface TransferRepository extends JpaRepository<MoneyTransfer, Account
 
 	@Query("select t from MoneyTransfer t where t.receiver.id=:receiver")
 	List<MoneyTransfer> findByReceiver(Long receiver);
+	
+	void  deleteBySender(Account account);
+	void deleteByReceiver(Account account);
 
 	
 	

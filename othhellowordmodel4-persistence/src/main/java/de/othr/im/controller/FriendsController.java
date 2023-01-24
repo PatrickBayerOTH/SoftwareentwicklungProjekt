@@ -191,14 +191,17 @@ public class FriendsController {
 	            // System.out.print(newFriend.getFriendId());
 	            friendRepository.save(newFriendReverse);
 
-
+	            try {
 	            SimpleMailMessage msgAddFriend = new SimpleMailMessage();
 	            msgAddFriend.setTo(curUser.getUser().getEmail());
-	            // System.out.println(friend.get().getUser().getName());
+	             System.out.println(friend.get().getUser().getName());
 	            msgAddFriend.setSubject("UniPays INFO: Sie haben einen Freund hinzugefügt");
 	            msgAddFriend.setText("Sie haben " + friend.get().getUser().getNachname() + " " + friend.get().getUser().getNachname() + "als Freund hinzugefügt");
 
 	            javaMailSender.send(msgAddFriend);
+	            }catch (Exception e) {
+	            	System.out.print("Email senden fehlgeschlagen");
+				}
 
 
 	            String msg = "Erfolgreich";
@@ -230,7 +233,7 @@ public class FriendsController {
 	        long deletedFriendsS = friendRepository.deleteByFriendIdAndUserId(Long.valueOf(curUser.getUser().getId()), id);
 
 	        Optional<StudentProfessor> friend = studentProfessorRepository.findStudentByIdUser(id);
-
+	        try {
 	        SimpleMailMessage msgRemoveFriend = new SimpleMailMessage();
 	        msgRemoveFriend.setTo(curUser.getUser().getEmail());
 	        // System.out.println(friend.get().getUser().getName());
@@ -238,6 +241,9 @@ public class FriendsController {
 	        msgRemoveFriend.setText("Sie haben " + friend.get().getUser().getNachname() + " " + friend.get().getUser().getNachname() + "als Freund entfernt");
 
 	        javaMailSender.send(msgRemoveFriend);
+	        }catch (Exception e) {
+	        	System.out.print("Email senden fehlgeschlagen");
+			}
 
 	        String msg = "Freund entfernt";
 	        attributes.addFlashAttribute("deleted", msg);
@@ -310,7 +316,7 @@ public class FriendsController {
 	                studentProfessorRepository.save(targetStudent);
 	                studentProfessorRepository.save(currentUser);
 
-
+	                try {
 	                SimpleMailMessage msgSend = new SimpleMailMessage();
 	                msgSend.setTo(currentUser.getUser().getEmail());
 	                // System.out.println(friend.get().getUser().getName());
@@ -326,6 +332,9 @@ public class FriendsController {
 	                msgRecieved.setText("Sie haben " + transfer.getAmount() + " Euro von " + currentUser.getUser().getNachname() + " " + currentUser.getUser().getNachname() + "empfangen");
 
 	                javaMailSender.send(msgRecieved);
+	                }catch (Exception e) {
+						System.out.print("Email senden fehlgeschlagen");
+					}
 
 
 	                if (oldKonto != currentUser.getAccount().getValue()) {

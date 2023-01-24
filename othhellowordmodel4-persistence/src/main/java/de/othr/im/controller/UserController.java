@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,10 @@ import java.util.*;
 @RequestMapping("/user")
 public class UserController {
 
-
+	@Autowired
+    FriendRepository friendRepository;
+	@Autowired
+	TransferRepository transferRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -335,6 +339,7 @@ public class UserController {
         return mv;
     }
 
+    @Transactional
     @RequestMapping(value = "/delete/{id}")
     public ModelAndView delete(@PathVariable("id") Long id, Model model) {
 
@@ -343,9 +348,14 @@ public class UserController {
         Optional<User> user = userRepository.findById(id);
         Optional<ConfirmationToken> confirmationToken = confirmationTokenRepository.findStudentByIdUser(id);
         Optional<Account> account = accountRepository.findById(id);
-
+        
 
         if (userRepository.existsById(id)) {
+        	long deletedFriends = friendRepository.deleteByuserId(Long.valueOf( id));
+	        long deletedFriendsS = friendRepository.deleteByFriendId(Long.valueOf( id));
+	       transferRepository.deleteBySender(account.get());
+	        transferRepository.deleteByReceiver(account.get());
+	        
             studentProfessorRepository.delete(optStudent.get());
             userRepository.delete(user.get());
             accountRepository.delete(account.get());
@@ -355,7 +365,10 @@ public class UserController {
             }
             model.addAttribute("msgs", "Schade, dass du nicht mehr bei uns bist!");
             mv.setViewName("/verwalten/student-deleted");
-            emailSenderByDeleteAccount(user.get());
+            try {
+            emailSenderByDeleteAccount(user.get());}catch (Exception e) {
+            	System.out.print("Email senden fehlgeschlagen");
+			}
         } else {
             model.addAttribute("errors", "Event not found!");
             mv.setViewName("redirect:/home");
