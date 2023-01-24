@@ -25,7 +25,7 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="home"><spring:message code="navbar.home"></spring:message></a>
+                    <a class="nav-link" href="/home"><spring:message code="navbar.home"></spring:message></a>
                 </li>
                 <li class="nav-item active">
                     <a class="nav-link" href="http://localhost:8080/mainpage"><spring:message code="navbar.mainpage"></spring:message></a>
@@ -40,7 +40,7 @@
                     <a class="nav-link" href="http://localhost:8080/sendMoney"><spring:message code="navbar.send"></spring:message></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="user/accountVerwalten/${studentSession.user.id}"><spring:message code="navbar.account"></spring:message></a>
+                    <a class="nav-link" href="/user/accountVerwalten/${studentSession.user.id}"><spring:message code="navbar.account"></spring:message></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/prelogout"><spring:message code="navbar.logout"></spring:message></a>
