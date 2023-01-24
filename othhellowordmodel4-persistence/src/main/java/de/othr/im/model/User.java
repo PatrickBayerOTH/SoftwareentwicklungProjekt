@@ -15,10 +15,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column( unique = true)
+
+    @Column(unique = true)
     private Integer matrikelnummer;
 
-    @Column(unique = true,nullable = false)
+    @Column(unique = true, nullable = false)
     @Email(message = "Please, inform a valid E-Mail!")
     private String email;
 

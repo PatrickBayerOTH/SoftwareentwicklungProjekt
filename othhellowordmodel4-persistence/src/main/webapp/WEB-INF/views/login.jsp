@@ -13,7 +13,7 @@
 </head>
 <body>
 <br><br>
-<h4 class="mt-1 mb-5 pb-1 d-flex justify-content-center"><spring:message code="login.head"/></h4>
+<h4 class="mt-1 mb-5 pb-1 d-flex justify-content-center"><spring:message code="navbar.head" /></h4>
 
 <div class="text-center">
     <div class="col-md-12">

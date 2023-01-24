@@ -23,10 +23,10 @@ import java.util.*;
 @RequestMapping("/user")
 public class UserController {
 
-	@Autowired
+    @Autowired
     FriendRepository friendRepository;
-	@Autowired
-	TransferRepository transferRepository;
+    @Autowired
+    TransferRepository transferRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -73,60 +73,39 @@ public class UserController {
 
         ModelAndView mv = new ModelAndView();
 
-        if (studentProfessor.getUser().getMatrikelnummer() == null) {
-            bindingResult.rejectValue("user.matrikelnummer", "error", "Matrikelnummer Ein Feld ist leer eingegeben.");
-            mv.setViewName("redirect:/user/student/add");
-            return mv;
-        }
-        if (studentProfessor.getUser().getEmail().isEmpty()) {
-            bindingResult.rejectValue("user.email", "error", "Email Feld ist leer eingegeben.");
-            mv.setViewName("redirect:/user/student/add");
-            return mv;
-        }
-
-        if (studentProfessor.getUser().getEmail().isEmpty()) {
-            bindingResult.rejectValue("user.email", "error", "Email Feld ist leer eingegeben.");
-            mv.setViewName("redirect:/user/student/add");
-            return mv;
-        }
-        if (studentProfessor.getUser().getPassword().isEmpty()) {
-            bindingResult.rejectValue("user.password", "error", "Password Feld ist leer eingegeben.");
-            mv.setViewName("redirect:/user/student/add");
-            return mv;
-        }
-        if (studentProfessor.getUser().getNachname().isEmpty()) {
-            bindingResult.rejectValue("user.nachname", "error", "Nachname Feld ist leer eingegeben.");
-            mv.setViewName("redirect:/user/student/add");
-            return mv;
-        }
-        if (studentProfessor.getUser().getName().isEmpty()) {
-            bindingResult.rejectValue("user.name", "error", "Name Feld ist leer eingegeben.");
-            mv.setViewName("redirect:/user/student/add");
-            return mv;
-        }
-        if (studentProfessor.getUser().getType().isEmpty()) {
-            bindingResult.rejectValue("user.type", "error", "Type Feld ist leer eingegeben.");
-            mv.setViewName("redirect:/user/student/add");
-            return mv;
-        }
-
         if (bindingResult.hasErrors()) {
+            mv.setViewName("/error-email");
+            return mv;
+        }
+
+        if (studentProfessor.getUser().getEmail().isEmpty() || studentProfessor.getUser().getType().isEmpty() || studentProfessor.getUser().getName().isEmpty()
+                || studentProfessor.getUser().getNachname().isEmpty() || studentProfessor.getUser().getPassword().isEmpty() || studentProfessor.getUser().getMatrikelnummer() == null ) {
+
+            mv.setViewName("/verwalten/student-add");
             mv.setViewName("redirect:/user/student/add");
             return mv;
         }
+
+        User user = studentProfessor.getUser();
 
         Optional<User> userDB = userRepository.findUserByEmail(studentProfessor.getUser().getEmail());
+        Optional<User> userDbToMtnr = userRepository.findUserMtnr(user.getMatrikelnummer());
 
 
         if (userDB.isPresent()) {
-            mv.addObject("message", "An account already exists for this login.");
-            mv.setViewName("redirect:/user/student/add");
+            bindingResult.rejectValue("user.email", "error.user", "An account already exists for this login.");
+            mv.setViewName("/error-email");
             return mv;
         }
+
+        if (userDbToMtnr.isPresent()) {
+            bindingResult.rejectValue("user.matrikelnummer", "error.user", "An account already exists for this login.");
+            mv.setViewName("/error-email");
+            return mv;
+        }
+
         String checkEmail = studentProfessor.getUser().getEmail();
         if (checkEmail.contains("@st.oth-regensburg.de")) {
-
-            User user = studentProfessor.getUser();
 
             List<Authority> myauthorities = new ArrayList<Authority>();
             myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
@@ -348,14 +327,14 @@ public class UserController {
         Optional<User> user = userRepository.findById(id);
         Optional<ConfirmationToken> confirmationToken = confirmationTokenRepository.findStudentByIdUser(id);
         Optional<Account> account = accountRepository.findById(id);
-        
+
 
         if (userRepository.existsById(id)) {
-        	long deletedFriends = friendRepository.deleteByuserId(Long.valueOf( id));
-	        long deletedFriendsS = friendRepository.deleteByFriendId(Long.valueOf( id));
-	       transferRepository.deleteBySender(account.get());
-	        transferRepository.deleteByReceiver(account.get());
-	        
+            long deletedFriends = friendRepository.deleteByuserId(Long.valueOf(id));
+            long deletedFriendsS = friendRepository.deleteByFriendId(Long.valueOf(id));
+            transferRepository.deleteBySender(account.get());
+            transferRepository.deleteByReceiver(account.get());
+
             studentProfessorRepository.delete(optStudent.get());
             userRepository.delete(user.get());
             accountRepository.delete(account.get());
@@ -366,9 +345,10 @@ public class UserController {
             model.addAttribute("msgs", "Schade, dass du nicht mehr bei uns bist!");
             mv.setViewName("/verwalten/student-deleted");
             try {
-            emailSenderByDeleteAccount(user.get());}catch (Exception e) {
-            	System.out.print("Email senden fehlgeschlagen");
-			}
+                emailSenderByDeleteAccount(user.get());
+            } catch (Exception e) {
+                System.out.print("Email senden fehlgeschlagen");
+            }
         } else {
             model.addAttribute("errors", "Event not found!");
             mv.setViewName("redirect:/home");
@@ -431,7 +411,6 @@ public class UserController {
         studentProfessorRepository.save(studentProfessor);
 
     }
-
 
     @RequestMapping(method = RequestMethod.POST, value = "/matrikelNummer/process/{id}")
     public ModelAndView updateUserByMatrikelnummer(@ModelAttribute("neuMatrikelnummer") User getuser, @PathVariable("id") Long id, Authentication authentication) {
