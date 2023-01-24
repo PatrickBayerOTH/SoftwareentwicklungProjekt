@@ -23,7 +23,7 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="home"><spring:message code="navbar.home"></spring:message></a>
+                    <a class="nav-link" href="http://localhost:8080/home"><spring:message code="navbar.home"></spring:message></a>
                 </li>
                 <li class="nav-item active">
                     <a class="nav-link" href="http://localhost:8080/mainpage"><spring:message code="navbar.mainpage"></spring:message></a>
@@ -44,11 +44,19 @@
                     <a class="nav-link" href="/prelogout"><spring:message code="navbar.logout"></spring:message></a>
                 </li>
             </ul>
-            <ul id="weather" class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto me-4">
+                <li>
+                    <a class="nav-link" href="?lang=en_US"><spring:message code="navbar.en"></spring:message></a>
+                </li>
+                <li>
+                    <a class="nav-link" href="?lang=de_DE"><spring:message code="navbar.de"></spring:message></a>
+                </li>
+            </ul>
+            <ul id="weather" class="navbar-nav">
                 <li>
                     <span class="navbar-text">
                         <div class="row">
-                            <div class="col">
+                            <div class="col-5">
                                 <div class="row">
                                     <spring:message code="navbar.weather.temp"></spring:message>: ${temp}
 
@@ -58,9 +66,8 @@
 
                                 </div>
                             </div>
-                            <div class="col">
+                            <div class="col-5">
                                 <img src="${wet}" alt="SVG mit img laden" width="64" height="64">
-
                             </div>
                         </div>
                     </span>
@@ -71,7 +78,7 @@
     </nav>
 </header>
 
-    <br><br><br><br>
+    <br><br><br><br><br>
     <div class="alert alert-success" role="alert">
         <h4 class="mt-1 mb-2 pb-1"><spring:message code="student.head"></spring:message> - ${studentSession.user.name} ${studentSession.user.nachname} </h4>
     </div>
