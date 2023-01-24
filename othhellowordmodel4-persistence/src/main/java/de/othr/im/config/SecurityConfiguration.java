@@ -44,7 +44,7 @@ public class SecurityConfiguration {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/oauth2/**").permitAll()//all users can access this page
                 .antMatchers("/user/**").permitAll()//all users can access this page
-                //.antMatchers("/admin/**", "/settings/**").hasAuthority("ADMIN")
+                .antMatchers("/admin/**", "/settings/**").hasAuthority("ADMIN")
                 //.antMatchers("/student/**", "/settings/**").hasAuthority("STUDENT")
                 //.antMatchers("/professor/**", "/settings/**").hasAuthority("PROFESSOR")
 
@@ -62,9 +62,9 @@ public class SecurityConfiguration {
                 .userInfoEndpoint()
                 .userService(oauthUserService).and()
                 .successHandler(oAuth2LoginSuccessHandler)
-                .and()
-
-                .logout().logoutSuccessUrl("/prelogout")
+                .and().logout()
+                .logoutSuccessUrl("/login")
+                .logoutUrl("/prelogout")
                 .invalidateHttpSession(true)
                 .permitAll();//.and().exceptionHandling().accessDeniedPage("/403");
 

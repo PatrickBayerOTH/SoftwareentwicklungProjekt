@@ -13,29 +13,39 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-
+    <title><spring:message code="friends_search.title"></spring:message></title>
 </head>
 
 <body>
     <header>
+        <!-- Fixed navbar -->
         <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-            <a class="navbar-brand" href="/home">UniPay</a>
+            <a class="navbar-brand" href="/home"><spring:message code="navbar.head"></spring:message></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="http://localhost:8080/mainpage">&Uuml;bersicht </a>
+                        <a class="nav-link" href="home"><spring:message code="navbar.home"></spring:message></a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="http://localhost:8080/mainpage"><spring:message code="navbar.mainpage"></spring:message></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="http://localhost:8080/activity">Aktivit&auml;ten</a>
+                        <a class="nav-link" href="http://localhost:8080/activity"><spring:message code="navbar.activities"></spring:message></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="http://localhost:8080/friends">Freunde</a>
+                        <a class="nav-link" href="http://localhost:8080/friends"><spring:message code="navbar.friends"></spring:message></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/prelogout">Logout</a>
+                        <a class="nav-link" href="http://localhost:8080/sendMoney"><spring:message code="navbar.send"></spring:message></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="user/accountVerwalten/${studentSession.user.id}"><spring:message code="navbar.account"></spring:message></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/prelogout"><spring:message code="navbar.logout"></spring:message></a>
                     </li>
                 </ul>
                 <ul id="weather" class="navbar-nav ms-auto">
@@ -44,11 +54,11 @@
                             <div class="row">
                                 <div class="col">
                                     <div class="row">
-                                        Temperatur: ${temp}
+                                        <spring:message code="navbar.weather.temp"></spring:message>: ${temp}
 
                                     </div>
                                     <div class="row">
-                                        ReelFeal: ${rf}
+                                        <spring:message code="navbar.weather.feel"></spring:message>: ${rf}
 
                                     </div>
                                 </div>
@@ -73,7 +83,7 @@
         <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
             <div class="spacesup"></div>
             <div class="text-center text-uppercase">
-                <h4>Suche Freunde</h4>
+                <h4><spring:message code="friends_search.head"></spring:message></h4>
 
             </div>
             <!-- Info Alert -->
@@ -110,7 +120,7 @@
                 </spring:bind>
 
                 <div class="form-group col-sm-3 d-flex justify-content-center justify-content-md-start">
-                    <button type="submit" class="btn btn-outline-secondary"><i class="fas fa-search"></i> <span class="esconder"> Search</span></button>
+                    <button type="submit" class="btn btn-outline-secondary"><i class="fas fa-search"></i> <span class="esconder"> <spring:message code="friends_search.form.btn"></spring:message></span></button>
                 </div>
             </form:form>
 
@@ -125,16 +135,16 @@
 
             <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
                 <div class="text-center mt-5">
-                    <h5>Ergebnisse deiner Suche:</h5>
+                    <h5><spring:message code="friends_search.table.head"></spring:message></h5>
                 </div>
 
                 <div class="table-responsive-md mt-3">
                     <table class="table table-striped table-hover display">
                         <thead>
                             <tr>
-                                <th style="display:none;" class="text-center">Id</th>
-                                <th class="text-center">Name</th>
-                                <th class="text-center">Nachname</th>
+                                <th style="display:none;" class="text-center"><spring:message code="friends_search.table.id"></spring:message></th>
+                                <th class="text-center"><spring:message code="friends_search.table.name"></spring:message></th>
+                                <th class="text-center"><spring:message code="friends_search.table.surname"></spring:message></th>
                             </tr>
                         </thead>
 
@@ -171,7 +181,7 @@
 
             <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
                 <div class="text-center mt-5">
-                    <h5>Gib etwas in die Suchleiste ein um nach Freunden zu suchen:) </h5>
+                    <h5><spring:message code="friends_search.notable.head"></spring:message></h5>
                 </div>
                 <div class="product-device shadow-sm d-none d-md-block"></div>
                 <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
@@ -190,16 +200,16 @@
         <c:if test="${not empty friends}">
             <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
                 <div class="text-center mt-5">
-                    <h5>Deine Freunde:</h5>
+                    <h5><spring:message code="friends_search.table.head"></spring:message></h5>
                 </div>
 
                 <div class="table-responsive-md mt-3">
                     <table class="table table-striped table-hover display">
                         <thead>
                             <tr>
-                                <th style="display:none;" class="text-center">Id</th>
-                                <th class="text-center">Name</th>
-                                <th class="text-center">Nachname</th>
+                                <th style="display:none;" class="text-center"><spring:message code="friends_search.table.id"></spring:message></th>
+                                <th class="text-center"><spring:message code="friends_search.table.name"></spring:message></th>
+                                <th class="text-center"><spring:message code="friends_search.table.surname"></spring:message></th>
 
                             </tr>
                         </thead>
@@ -256,7 +266,7 @@
         <c:if test="${empty friends}">
             <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
                 <div class="text-center mt-5">
-                    <h5>Du hast noch keine Freunde </h5>
+                    <h5><spring:message code="friends_search.notable.nofriends"></spring:message></h5>
                 </div>
                 <div class="product-device shadow-sm d-none d-md-block"></div>
                 <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>

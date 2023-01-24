@@ -5,10 +5,12 @@ import de.othr.im.repository.AccountRepository;
 import de.othr.im.repository.CorporateRepository;
 import de.othr.im.repository.StudentProfessorRepository;
 import de.othr.im.repository.TransferRepository;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +40,7 @@ public class AccountController {
             sender.add(convertName(m.getSender()));
             receiver.add(convertName(m.getReceiver()));
         }
+        getWeather(request);
         model.addAttribute("transfers", transfers);
         model.addAttribute("sender", sender);
         model.addAttribute("receiver", receiver);
@@ -70,4 +73,53 @@ public class AccountController {
         }
         return "";
     }
+
+    private void getWeather(HttpServletRequest request) {
+        String key = "d4d77f62e03de4155aeda1baf768bd49";
+        String city = "Regensburg";
+        String uri = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&APPID=" + key;
+
+        RestTemplate rT = new RestTemplate();
+        String result = rT.getForObject(uri, String.class);
+        // System.out.print(result);
+        JSONObject jo = new JSONObject(result);
+        JSONObject wetObj = jo.getJSONArray("weather").getJSONObject(0);
+        String wet = wetObj.getString("main");
+        System.out.println(wet);
+        switch (wet) {
+            case "Clouds":
+                wet="http://openweathermap.org/img/wn/02d@2x.png";
+                break;
+            case "Thunderstorm":
+                wet="http://openweathermap.org/img/wn/11d@2x.png";
+                break;
+            case "Drizzle":
+                wet="http://openweathermap.org/img/wn/09d@2x.png";
+                break;
+            case "Rain":
+                wet="http://openweathermap.org/img/wn/10d@2x.png";
+                break;
+            case "Snow":
+                wet="http://openweathermap.org/img/wn/13d@2x.png";
+                break;
+            case "Clear":
+                wet="http://openweathermap.org/img/wn/01d@2x.png";
+                break;
+
+            default:
+                break;
+        }
+        request.getSession().setAttribute("wet", wet);
+        double temp = jo.getJSONObject("main").getDouble("temp") - 273.15;
+        double rf = jo.getJSONObject("main").getDouble("feels_like") - 273.15;
+        String tempS = String.format("%.2f", temp);
+        String rfS = String.format("%.2f", rf);
+        request.getSession().setAttribute("temp", tempS);
+        request.getSession().setAttribute("rf", rfS);
+
+
+    }
+
 }
+
+
