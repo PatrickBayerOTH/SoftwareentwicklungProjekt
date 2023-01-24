@@ -10,8 +10,10 @@ import de.othr.im.model.*;
 import de.othr.im.model.oauthUser.CustomOAuth2User;
 import de.othr.im.repository.*;
 
+import de.othr.im.util.I18nFunctions;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -139,7 +141,7 @@ public class HomeController {
 		JSONObject jo = new JSONObject(result);
 		JSONObject wetObj = jo.getJSONArray("weather").getJSONObject(0);
 		String wet = wetObj.getString("main");
-		System.out.println(wet);
+		//System.out.println(wet);
 		switch (wet) {
 		case "Clouds":
 			wet="http://openweathermap.org/img/wn/02d@2x.png";
@@ -166,8 +168,10 @@ public class HomeController {
 		request.getSession().setAttribute("wet", wet);
 		double temp = jo.getJSONObject("main").getDouble("temp") - 273.15;
 		double rf = jo.getJSONObject("main").getDouble("feels_like") - 273.15;
-		String tempS = String.format("%.2f", temp);
-		String rfS = String.format("%.2f", rf);
+        String tempS = I18nFunctions.localizeTemperature(temp, LocaleContextHolder.getLocale());
+        //String tempS = String.format("%.2f", temp);
+        String rfS = I18nFunctions.localizeTemperature(rf, LocaleContextHolder.getLocale());
+        //String rfS = String.format("%.2f", rf);
 		request.getSession().setAttribute("temp", tempS);
 		request.getSession().setAttribute("rf", rfS);
     	

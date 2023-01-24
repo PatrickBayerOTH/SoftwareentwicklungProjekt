@@ -18,7 +18,7 @@ public class LocaleConfiguration implements WebMvcConfigurer {
     @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver resolver = new SessionLocaleResolver();
-        resolver.setDefaultLocale(Locale.GERMAN);
+        resolver.setDefaultLocale(Locale.GERMANY);
         resolver.setLocaleAttributeName("session.current.locale");
         resolver.setTimeZoneAttributeName("session.current.timezone");
         return resolver;
@@ -31,11 +31,12 @@ public class LocaleConfiguration implements WebMvcConfigurer {
         return interceptor;
     }
 
+    @Bean("messageSource")
     public MessageSource messageSource() {
         ResourceBundleMessageSource source = new ResourceBundleMessageSource();
-        //source.setBasename("messages");
+        source.setBasename("messages");
         source.setDefaultEncoding("UTF-8");
-        source.setDefaultLocale(Locale.GERMAN);
+        source.setDefaultLocale(Locale.GERMANY);
         return source;
     }
 

@@ -5,13 +5,14 @@ import de.othr.im.repository.AccountRepository;
 import de.othr.im.repository.CorporateRepository;
 import de.othr.im.repository.StudentProfessorRepository;
 import de.othr.im.repository.TransferRepository;
+import de.othr.im.util.I18nFunctions;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -35,12 +36,15 @@ public class AccountController {
     public String account(Model model, HttpServletRequest request) {
         StudentProfessor user = (StudentProfessor) request.getSession().getAttribute("studentSession");
         List<MoneyTransfer> transfers = getAffiliatedTransactions(user);
-        List<String> sender = new ArrayList<String>(), receiver = new ArrayList<String>();
+        List<String> sender = new ArrayList<>(), receiver = new ArrayList<>(), date = new ArrayList<>();
+
         for(MoneyTransfer m : transfers) {
             sender.add(convertName(m.getSender()));
             receiver.add(convertName(m.getReceiver()));
+            date.add(I18nFunctions.localizeDate(m.getDate(), LocaleContextHolder.getLocale()));
         }
         getWeather(request);
+        model.addAttribute("date", date);
         model.addAttribute("transfers", transfers);
         model.addAttribute("sender", sender);
         model.addAttribute("receiver", receiver);
@@ -85,7 +89,7 @@ public class AccountController {
         JSONObject jo = new JSONObject(result);
         JSONObject wetObj = jo.getJSONArray("weather").getJSONObject(0);
         String wet = wetObj.getString("main");
-        System.out.println(wet);
+        //System.out.println(wet);
         switch (wet) {
             case "Clouds":
                 wet="http://openweathermap.org/img/wn/02d@2x.png";
@@ -112,8 +116,10 @@ public class AccountController {
         request.getSession().setAttribute("wet", wet);
         double temp = jo.getJSONObject("main").getDouble("temp") - 273.15;
         double rf = jo.getJSONObject("main").getDouble("feels_like") - 273.15;
-        String tempS = String.format("%.2f", temp);
-        String rfS = String.format("%.2f", rf);
+        String tempS = I18nFunctions.localizeTemperature(temp, LocaleContextHolder.getLocale());
+        //String tempS = String.format("%.2f", temp);
+        String rfS = I18nFunctions.localizeTemperature(rf, LocaleContextHolder.getLocale());
+        //String rfS = String.format("%.2f", rf);
         request.getSession().setAttribute("temp", tempS);
         request.getSession().setAttribute("rf", rfS);
 

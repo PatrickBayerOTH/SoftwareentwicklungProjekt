@@ -7,8 +7,10 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import de.othr.im.util.I18nFunctions;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
@@ -260,10 +262,11 @@ public class FriendsController {
 
 	        StudentProfessor currentUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
 	        List<MoneyTransfer> transactions = getAffiliatedTransactions(currentUser);
-	        List<String> sender = new ArrayList<>(), receiver = new ArrayList<>();
+	        List<String> sender = new ArrayList<>(), receiver = new ArrayList<>(), date = new ArrayList<>();
 	        for(MoneyTransfer m : transactions) {
 	            sender.add(convertName(m.getSender()));
 	            receiver.add(convertName(m.getReceiver()));
+				date.add(I18nFunctions.localizeDate(m.getDate(), LocaleContextHolder.getLocale()));
 	        }
 	        List<Integer> directions = new ArrayList<Integer>();
 	        for (MoneyTransfer m : transactions) {
@@ -279,6 +282,7 @@ public class FriendsController {
 	        }
 	        model.addAttribute("directions", directions);
 	        getWeather(request);
+			model.addAttribute("date", date);
 	        model.addAttribute("transactions", transactions);
 	        model.addAttribute("sender", sender);
 	        model.addAttribute("receiver", receiver);
@@ -379,11 +383,13 @@ public class FriendsController {
 	    public ModelAndView sendMoneywoF(Model model, HttpServletRequest request, RedirectAttributes attributes) {
 	        StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
 	        List<MoneyTransfer> transactions = getAffiliatedTransactions(curUser);
-	        List<String> sender = new ArrayList<>(), receiver = new ArrayList<>();
+	        List<String> sender = new ArrayList<>(), receiver = new ArrayList<>(), date = new ArrayList<>();
 	        for(MoneyTransfer m : transactions) {
 	            sender.add(convertName(m.getSender()));
 	            receiver.add(convertName(m.getReceiver()));
+				date.add(I18nFunctions.localizeDate(m.getDate(), LocaleContextHolder.getLocale()));
 	        }
+			model.addAttribute("date", date);
 	        model.addAttribute("transactions", transactions);
 	        model.addAttribute("sender", sender);
 	        model.addAttribute("receiver", receiver);
@@ -510,50 +516,9 @@ public class FriendsController {
 
 
 	    @GetMapping("/mainpage")
-		public String mainpage(Model model) {
-			
-			String key = "d4d77f62e03de4155aeda1baf768bd49";
-			String city = "Regensburg";
-			String uri = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&APPID=" + key;
-
-			RestTemplate rT = new RestTemplate();
-			String result = rT.getForObject(uri, String.class);
-			// System.out.print(result);
-			JSONObject jo = new JSONObject(result);
-			JSONObject wetObj = jo.getJSONArray("weather").getJSONObject(0);
-			String wet = wetObj.getString("main");
-			System.out.println(wet);
-			switch (wet) {
-			case "Clouds":
-				wet="http://openweathermap.org/img/wn/02d@2x.png";
-				break;
-			case "Thunderstorm":
-				wet="http://openweathermap.org/img/wn/11d@2x.png";
-				break;
-			case "Drizzle":
-				wet="http://openweathermap.org/img/wn/09d@2x.png";
-				break;
-			case "Rain":
-					wet="http://openweathermap.org/img/wn/10d@2x.png";
-				break;
-			case "Snow":
-				wet="http://openweathermap.org/img/wn/13d@2x.png";
-				break;
-			case "Clear":
-				wet="http://openweathermap.org/img/wn/01d@2x.png";
-				break;
-
-			default:
-				break;
-			}
-			model.addAttribute("wet", wet);
-			double temp = jo.getJSONObject("main").getDouble("temp") - 273.15;
-			double rf = jo.getJSONObject("main").getDouble("feels_like") - 273.15;
-			String tempS = String.format("%.2f", temp);
-			String rfS = String.format("%.2f", rf);
-			model.addAttribute("temp", tempS);
-			model.addAttribute("rf", rfS);
-			return "mainpage";
+		public String mainpage(Model model, HttpServletRequest request) {
+		  getWeather(request);
+		  return "mainpage";
 		}
 	    
 	    public void getWeather(HttpServletRequest request) {
@@ -567,7 +532,7 @@ public class FriendsController {
 			JSONObject jo = new JSONObject(result);
 			JSONObject wetObj = jo.getJSONArray("weather").getJSONObject(0);
 			String wet = wetObj.getString("main");
-			System.out.println(wet);
+			//System.out.println(wet);
 			switch (wet) {
 			case "Clouds":
 				wet="http://openweathermap.org/img/wn/02d@2x.png";
@@ -594,8 +559,10 @@ public class FriendsController {
 			request.getSession().setAttribute("wet", wet);
 			double temp = jo.getJSONObject("main").getDouble("temp") - 273.15;
 			double rf = jo.getJSONObject("main").getDouble("feels_like") - 273.15;
-			String tempS = String.format("%.2f", temp);
-			String rfS = String.format("%.2f", rf);
+			String tempS = I18nFunctions.localizeTemperature(temp, LocaleContextHolder.getLocale());
+			//String tempS = String.format("%.2f", temp);
+			String rfS = I18nFunctions.localizeTemperature(rf, LocaleContextHolder.getLocale());
+			//String rfS = String.format("%.2f", rf);
 			request.getSession().setAttribute("temp", tempS);
 			request.getSession().setAttribute("rf", rfS);
 	    	
