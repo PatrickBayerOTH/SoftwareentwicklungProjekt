@@ -24,7 +24,7 @@
 <br>
 <div>
     <a class="btn btn-outline-primary ui-state-active" type="button" href="/user/student/add"
-       role="button"><spring:message code="student_deleted.singup"></spring:message></a>
+       role="button"><spring:message code="student_deleted.signup"></spring:message></a>
 </div>
 
 
