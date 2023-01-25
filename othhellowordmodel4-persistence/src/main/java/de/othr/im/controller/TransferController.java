@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -211,6 +213,164 @@ public class TransferController {
         transfer.setDate(new Timestamp(System.currentTimeMillis()));
 
         transferRepository.save(transfer);
+    }
+
+    @GetMapping("/transfer/{corporateId}")
+    public TransferList getTransfers(@PathVariable Long corporateId) {
+        Optional<Corporate> corporate = corporateRepository.findById(corporateId);
+        if(corporate.isPresent()) {
+            Corporate client  = corporate.get();
+            Account account = client.getAccount();
+            List<TransferReport> transfers = new ArrayList<>();
+            //create transfer list
+            List<MoneyTransfer> base = getAffiliatedTransactions(client);
+            for(MoneyTransfer m : base) {
+                Actor sender = new Actor(m.getSender().getId(), convertName(m.getSender()));
+                Actor receiver = new Actor(m.getReceiver().getId(), convertName(m.getReceiver()));
+                TransferReport transferForm = new TransferReport(sender, receiver, m.getAmount(), m.getDate());
+                transfers.add(transferForm);
+            }
+
+            return new TransferList(client.getId(), client.getName(), transfers);
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requested Corporation does not exist");
+    }
+
+    class TransferList {
+        long corporation_id;
+        String corporation_name;
+        List<TransferReport> transfers;
+
+        public long getCorporation_id() {
+            return corporation_id;
+        }
+
+        public void setCorporation_id(long corporation_id) {
+            this.corporation_id = corporation_id;
+        }
+
+        public String getCorporation_name() {
+            return corporation_name;
+        }
+
+        public void setCorporation_name(String corporation_name) {
+            this.corporation_name = corporation_name;
+        }
+
+        public List<TransferReport> getTransfers() {
+            return transfers;
+        }
+
+        public void setTransfers(List<TransferReport> transfers) {
+            this.transfers = transfers;
+        }
+
+        public TransferList(long corporation_id, String corporation_name, List<TransferReport> transfers) {
+            this.corporation_id = corporation_id;
+            this.corporation_name = corporation_name;
+            this.transfers = transfers;
+        }
+    }
+
+    class TransferReport {
+
+        Actor sender;
+        Actor receiver;
+        double value;
+        Timestamp date;
+
+        public Actor getSender() {
+            return sender;
+        }
+
+        public void setSender(Actor sender) {
+            this.sender = sender;
+        }
+
+        public Actor getReceiver() {
+            return receiver;
+        }
+
+        public void setReceiver(Actor receiver) {
+            this.receiver = receiver;
+        }
+
+        public double getValue() {
+            return value;
+        }
+
+        public void setValue(double value) {
+            this.value = value;
+        }
+
+        public Timestamp getDate() {
+            return date;
+        }
+
+        public void setDate(Timestamp date) {
+            this.date = date;
+        }
+
+
+        public TransferReport(Actor sender, Actor receiver, double value, Timestamp date) {
+            this.sender = sender;
+            this.receiver = receiver;
+            this.value = value;
+            this.date = date;
+        }
+    }
+
+    class Actor {
+        long account_id;
+        String name;
+
+        public long getAccount_id() {
+            return account_id;
+        }
+
+        public void setAccount_id(long account_id) {
+            this.account_id = account_id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Actor(long account_id, String name) {
+            this.account_id = account_id;
+            this.name = name;
+        }
+    }
+
+    private List<MoneyTransfer> getAffiliatedTransactions(Corporate user) {
+        Optional<Account> accountOptional = accountRepository.findById(user.getAccount().getId());
+        if(accountOptional.isEmpty()) {
+            return null;
+        }
+        Account account = accountOptional.get();
+        //get inbound Transactions
+        List<MoneyTransfer> transfers = transferRepository.findByReceiver(account.getId());
+        //get outbound Transactions
+        transfers.addAll(transferRepository.findBySender(account.getId()));
+        return transfers;
+    }
+
+    private String convertName(Account account) {
+        //check if account is student
+        Optional<StudentProfessor> studentProfessor = studentProfessorRepository.findByAccount(account.getId());
+        if(studentProfessor.isPresent()) {
+            String out =  studentProfessor.get().getUser().getName() + " " + studentProfessor.get().getUser().getNachname();
+            return out;
+        }
+        Optional<Corporate> corporate = corporateRepository.findByAccount(account.getId());
+        if(corporate.isPresent()) {
+            return corporate.get().getName();
+        }
+        return "";
     }
 
 }

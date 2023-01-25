@@ -42,6 +42,7 @@ public class SecurityConfiguration {
 
         http.authorizeRequests()
                 .antMatchers("/login").permitAll()
+                .antMatchers("/api/**").permitAll()
                 .antMatchers("/oauth2/**").permitAll()//all users can access this page
                 .antMatchers("/user/**").permitAll()//all users can access this page
                 .antMatchers("/admin/**", "/settings/**").hasAuthority("ADMIN")
