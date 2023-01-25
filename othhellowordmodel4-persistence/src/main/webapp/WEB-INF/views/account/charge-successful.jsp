@@ -1,3 +1,19 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><spring:message code="charge_success.title"></spring:message></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+</head>
+
+<body>
+
 <header>
     <!-- Fixed navbar -->
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
@@ -8,7 +24,7 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="home"><spring:message code="navbar.home"></spring:message></a>
+                    <a class="nav-link" href="http://localhost:8080/home"><spring:message code="navbar.home"></spring:message></a>
                 </li>
                 <li class="nav-item active">
                     <a class="nav-link" href="http://localhost:8080/mainpage"><spring:message code="navbar.mainpage"></spring:message></a>
@@ -62,3 +78,56 @@
         </div>
     </nav>
 </header>
+
+    <div class="overflow-hidden p-3 p-md-5 m-md-3 bg-light">
+            <h1><spring:message code="charge_success.head"></spring:message></h1>
+            <div>
+                <a href="/account" class="btn btn-outline-primary ui-state-active" type="button" role="button"><spring:message code="charge_success.btn"></spring:message></a>
+            </div>
+    </div>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+</body>
+
+</html>
+<style>
+    .div-1 {
+        height: 400px;
+        background-color: #EBEBEB;
+    }
+
+    .div-2 {
+        height: 400px;
+        background-color: #ABBAEA;
+    }
+
+    .div-3 {
+        height: 400px;
+        background-color: #FBD603;
+    }
+
+    .img1 {
+        position: relative;
+        top: 0px;
+        right: 0px;
+        width: 100px;
+        height: 100px;
+
+    }
+
+    .img2 {
+        position: relative;
+        top: 80px;
+        right: 0px;
+        width: 100px;
+        height: 100px;
+
+    }
+    body {
+        padding-top: 70px
+    }
+
+</style>

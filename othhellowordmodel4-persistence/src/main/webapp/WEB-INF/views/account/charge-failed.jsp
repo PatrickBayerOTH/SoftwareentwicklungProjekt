@@ -1,6 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
 <!doctype html>
 <html lang="en">
@@ -9,7 +8,7 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><spring:message code="account.title"></spring:message></title>
+    <title><spring:message code="charge_fail.title"></spring:message></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
 </head>
 
@@ -79,50 +78,12 @@
         </div>
     </nav>
 </header>
-    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+
     <div class="overflow-hidden p-3 p-md-5 m-md-3 bg-light">
-        <h1><spring:message code="account.head"></spring:message></h1>
-        <div>
-            <h3><spring:message code="account.current"></spring:message>: ${credit}</h3>
-        </div>
-        <form:form method="POST" action="/paypal" modelAttribute="order">
-            <h5><spring:message code="account.form.head"></spring:message></h5>
-            <label for="amount"><spring:message code="account.form.amount"></spring:message></label>
-            <form:input type="number" id="amount" name="amount" path="price" min="1" step=".01"/>
-            <form:input type="hidden" path="description" value="UniPay"/>
-            <spring:message code="account.form.btn" var="btn"></spring:message>
-            <input class="btn btn-outline-primary ui-state-active" type="submit" value="${btn}"/>
-        </form:form>
-        <div class="table-responsive-md mt-3">
-            <table class="table table-striped table-hover display">
-                <thead>
-                    <tr>
-                        <th class="text-center"><spring:message code="account.table.sender"></spring:message></th>
-                        <th class="text-center"><spring:message code="account.table.receiver"></spring:message></th>
-                        <th class="text-center"><spring:message code="account.table.amount"></spring:message></th>
-                        <th class="text-center"><spring:message code="account.table.date"></spring:message></th>
-                    </tr>
-                </thead>
-                <c:forEach var="transaction" items="${transfers}" varStatus="index">
-                    <tr>
-                        <td>
-                        ${sender[index.index]}
-                        </td>
-                        <td>
-                        ${receiver[index.index]}
-                        </td>
-                        <td>
-                        ${transaction.amount}
-                        </td>
-                        <td>
-                        ${date[index.index]}
-                        </td>
-                    </tr>
-                </c:forEach>
-
-
-            </table>
-        </div>
+            <h1><spring:message code="charge_fail.head"></spring:message></h1>
+            <div>
+                <a href="/account" class="btn btn-outline-primary ui-state-active" type="button" role="button"><spring:message code="charge_fail.btn"></spring:message></a>
+            </div>
     </div>
 
 
