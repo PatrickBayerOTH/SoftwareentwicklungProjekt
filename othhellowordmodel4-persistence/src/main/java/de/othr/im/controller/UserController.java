@@ -284,6 +284,8 @@ public class UserController {
 
         Integer mtnr = user.getMatrikelnummer();
         String email = user.getEmail();
+        Optional<Account> account = accountRepository.findById(user.getId());
+
 
         List<Authority> myauthorities = new ArrayList<Authority>();
         myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
@@ -305,6 +307,7 @@ public class UserController {
 
         studentProfessor.setMatrikelnummer(mtnr);
         studentProfessor.setUser(user);
+        studentProfessor.setAccount(account.get());
         studentProfessorRepository.save(studentProfessor);
 
         return mv;
