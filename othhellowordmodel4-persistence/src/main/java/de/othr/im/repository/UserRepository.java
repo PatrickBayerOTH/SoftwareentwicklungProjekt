@@ -19,8 +19,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE u.matrikelnummer = :matrikelnummer")
     Optional<User> findUserMtnr(Integer matrikelnummer);
-
+    
+    @Query("SELECT u FROM User u WHERE u.name = :name")
     List<User> findByNameContaining(String name);
+    
+    @Query("SELECT u FROM User u WHERE u.nachname = :nachname")
+	List<User> findByNachnameContaining(String nachname);
 
 
 }

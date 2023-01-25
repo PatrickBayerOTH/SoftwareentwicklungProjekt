@@ -28,12 +28,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import de.othr.im.model.Account;
 import de.othr.im.model.Corporate;
 import de.othr.im.model.Friend;
+import de.othr.im.model.HistoricFriendTransfer;
 import de.othr.im.model.MoneyTransfer;
 import de.othr.im.model.StudentProfessor;
 import de.othr.im.model.User;
 import de.othr.im.repository.AccountRepository;
 import de.othr.im.repository.CorporateRepository;
 import de.othr.im.repository.FriendRepository;
+import de.othr.im.repository.HistoricFriendTransferRepository;
 import de.othr.im.repository.ManagerRepository;
 import de.othr.im.repository.StudentProfessorRepository;
 import de.othr.im.repository.TransferRepository;
@@ -45,6 +47,9 @@ public class FriendsController {
     @Autowired
     private JavaMailSender javaMailSender;
 
+    
+    @Autowired
+    HistoricFriendTransferRepository hFRepository;
 
     @Autowired
     UserRepository userRepository;
@@ -124,7 +129,10 @@ public class FriendsController {
 
 
 	        //model.addAttribute("students", studentRepository.findByNameContaining(friend.getName()));
-	        model.addAttribute("students", userRepository.findByNameContaining(friend.getName()));
+	        List<User> finds =  userRepository.findByNameContaining(friend.getName());
+	        List<User> findsNachname =  userRepository.findByNachnameContaining(friend.getNachname());
+	        finds.addAll(findsNachname);
+	        model.addAttribute("students", finds);
 
 	        List<Friend> friends = friendRepository.findByuserId(Long.valueOf(curUser.getUser().getId()));
 
@@ -261,17 +269,23 @@ public class FriendsController {
 
 
 	        StudentProfessor currentUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
-	        List<MoneyTransfer> transactions = getAffiliatedTransactions(currentUser);
+	        //List<MoneyTransfer> transactions = getAffiliatedTransactions(currentUser);
+	        List<HistoricFriendTransfer> transactions = hFRepository.findBysenderId(currentUser.getUser().getId()); //Out
+	        List<HistoricFriendTransfer> transactionsIn = hFRepository.findByreceiverId(currentUser.getUser().getId());
+	        transactions.addAll(transactionsIn);
+	        
 	        List<String> sender = new ArrayList<>(), receiver = new ArrayList<>(), date = new ArrayList<>();
-	        for(MoneyTransfer m : transactions) {
-	            sender.add(convertName(m.getSender()));
-	            receiver.add(convertName(m.getReceiver()));
+	        for(HistoricFriendTransfer m : transactions) {
+	            //sender.add(convertName(m.getSender()));
+	        	sender.add(m.getSender());
+	            //receiver.add(convertName(m.getReceiver()));
+	        	receiver.add(m.getReceiver());
 				date.add(I18nFunctions.localizeDate(m.getDate(), LocaleContextHolder.getLocale()));
 	        }
 	        List<Integer> directions = new ArrayList<Integer>();
-	        for (MoneyTransfer m : transactions) {
-	        	if(m.getSender().getId()==currentUser.getAccount().getId()) {
-	        		System.out.printf("Sender:%s Current User:%s",m.getSender().getId(),currentUser.getAccount().getId());
+	        for (HistoricFriendTransfer m : transactions) {
+	        	if(m.getSenderid() == currentUser.getAccount().getId()) {
+	        		//System.out.printf("Sender:%s Current User:%s",m.getSender().getId(),currentUser.getAccount().getId());
 	        		directions.add(1);
 	        		
 	        	}else {
@@ -316,6 +330,21 @@ public class FriendsController {
 	                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 	                transfer.setDate(timestamp);
 	                
+	                HistoricFriendTransfer newhFTransfer = new HistoricFriendTransfer();
+	                long senderid= Long.valueOf(currentUser.getUser().getId());
+	                newhFTransfer.setSenderid(senderid);
+	                long receiverid= Long.valueOf(targetStudent.getUser().getId());
+	                newhFTransfer.setReceiverid(receiverid);
+	                newhFTransfer.setSender(currentUser.getUser().getName()+" " + currentUser.getUser().getNachname());
+	                newhFTransfer.setReceiver(targetStudent.getUser().getName()+" " + targetStudent.getUser().getNachname());
+	                newhFTransfer.setAmount(transfer.getAmount());
+	                newhFTransfer.setMessage(transfer.getMessage());
+	                newhFTransfer.setDate(timestamp);
+	               
+	                
+	               
+	                
+	                hFRepository.save(newhFTransfer);
 	                transferRepository.save(transfer);
 	                studentProfessorRepository.save(targetStudent);
 	                studentProfessorRepository.save(currentUser);
@@ -382,11 +411,15 @@ public class FriendsController {
 	    @RequestMapping(value = "/sendMoney")
 	    public ModelAndView sendMoneywoF(Model model, HttpServletRequest request, RedirectAttributes attributes) {
 	        StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
-	        List<MoneyTransfer> transactions = getAffiliatedTransactions(curUser);
+	        List<HistoricFriendTransfer> transactions = hFRepository.findBysenderId(curUser.getUser().getId()); //Out
+	        List<HistoricFriendTransfer> transactionsIn = hFRepository.findByreceiverId(curUser.getUser().getId());
+	        transactions.addAll(transactionsIn);
 	        List<String> sender = new ArrayList<>(), receiver = new ArrayList<>(), date = new ArrayList<>();
-	        for(MoneyTransfer m : transactions) {
-	            sender.add(convertName(m.getSender()));
-	            receiver.add(convertName(m.getReceiver()));
+	        for(HistoricFriendTransfer m : transactions) {
+	        	//sender.add(convertName(m.getSender()));
+	        	sender.add(m.getSender());
+	            //receiver.add(convertName(m.getReceiver()));
+	        	receiver.add(m.getReceiver());
 				date.add(I18nFunctions.localizeDate(m.getDate(), LocaleContextHolder.getLocale()));
 	        }
 			model.addAttribute("date", date);
@@ -396,9 +429,9 @@ public class FriendsController {
 //	        List<MoneyTransfer> transactions = transferRepository.findByFrom(curUser.getAccount().getId();
 //	        System.out.print(transactions);
 	        List<Integer> directions = new ArrayList<Integer>();
-	        for (MoneyTransfer m : transactions) {
-	        	if(m.getSender().getId()==curUser.getAccount().getId()) {
-	        		System.out.printf("Sender:%s Current User:%s",m.getSender().getId(),curUser.getAccount().getId());
+	        for (HistoricFriendTransfer m : transactions) {
+	        	if(m.getSenderid() == curUser.getAccount().getId()) {
+	        		//System.out.printf("Sender:%s Current User:%s",m.getSender().getId(),currentUser.getAccount().getId());
 	        		directions.add(1);
 	        		
 	        	}else {
