@@ -127,13 +127,16 @@ public class FriendsController {
 
 	        StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
 
-
 	        //model.addAttribute("students", studentRepository.findByNameContaining(friend.getName()));
 	        List<User> finds =  userRepository.findAllByNameContaining(friend.getName());
-	        System.out.print(friend.getNachname());
+	       
 	        List<User> findsNachname =  userRepository.findAllByNachnameContaining(friend.getName());
-	        System.out.print(findsNachname);
-	        finds.addAll(findsNachname);
+	        List<User> listNachnameCopy = new ArrayList<>(findsNachname);
+	        listNachnameCopy.removeAll(finds);
+	        System.out.printf("CurUserID: %d", curUser.getId());
+	        finds.addAll(listNachnameCopy);
+	        finds.removeIf(u -> u.getId()==curUser.getId());
+	       
 	        model.addAttribute("students", finds);
 
 	        List<Friend> friends = friendRepository.findByuserId(Long.valueOf(curUser.getUser().getId()));
