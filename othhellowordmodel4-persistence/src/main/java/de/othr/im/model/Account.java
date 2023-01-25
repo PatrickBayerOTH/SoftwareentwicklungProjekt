@@ -31,6 +31,10 @@ public class Account {
         this.value = value;
     }
 
+    public void addValue(double value) {
+        this.value = this.value + value;
+    }
+
 
 
 

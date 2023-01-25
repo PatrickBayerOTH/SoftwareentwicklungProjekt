@@ -1,20 +1,27 @@
 package de.othr.im.controller;
 
+import com.paypal.api.payments.Links;
+import com.paypal.api.payments.Payment;
+import com.paypal.base.rest.PayPalRESTException;
 import de.othr.im.model.*;
 import de.othr.im.repository.AccountRepository;
 import de.othr.im.repository.CorporateRepository;
 import de.othr.im.repository.StudentProfessorRepository;
 import de.othr.im.repository.TransferRepository;
+import de.othr.im.service.PaypalService;
 import de.othr.im.util.I18nFunctions;
+import de.othr.im.util.PaypalOrder;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +29,8 @@ import java.util.Optional;
 @Controller
 public class AccountController {
 
+    @Autowired
+    PaypalService service;
     @Autowired
     TransferRepository transferRepository;
     @Autowired
@@ -35,6 +44,8 @@ public class AccountController {
     @RequestMapping("/account")
     public String account(Model model, HttpServletRequest request) {
         StudentProfessor user = (StudentProfessor) request.getSession().getAttribute("studentSession");
+        DecimalFormat df = new DecimalFormat("0.00");
+        model.addAttribute("credit", df.format(user.getAccount().getValue()));
         List<MoneyTransfer> transfers = getAffiliatedTransactions(user);
         List<String> sender = new ArrayList<>(), receiver = new ArrayList<>(), date = new ArrayList<>();
 
@@ -48,8 +59,79 @@ public class AccountController {
         model.addAttribute("transfers", transfers);
         model.addAttribute("sender", sender);
         model.addAttribute("receiver", receiver);
+        model.addAttribute("order", new PaypalOrder(0.00, "UniPay"));
         return "/account/account";
     }
+
+    @PostMapping("/paypal")
+    public String payment(@ModelAttribute("order") PaypalOrder order) {
+        try {
+            Payment payment = service.createPayment(order.getPrice(), order.getCurrency(), order.getMethod(),
+                    order.getIntent(), order.getDescription(), "http://localhost:8080/charge-failed",
+                    "http://localhost:8080/charge-successfull");
+            for(Links link:payment.getLinks()) {
+                if(link.getRel().equals("approval_url")) {
+                    return "redirect:"+link.getHref();
+                }
+            }
+
+        } catch (PayPalRESTException e) {
+
+            e.printStackTrace();
+        }
+        return "redirect:/";
+    }
+
+    @GetMapping("/charge-failed")
+    public String cancelPay(HttpServletRequest request) {
+        getWeather(request);
+        return "/account/charge-failed";
+    }
+
+    @GetMapping("/charge-successfull")
+    public String successfullPay(@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId, HttpServletRequest request) {
+        try {
+            Payment payment = service.executePayment(paymentId, payerId);
+            if (payment.getState().equals("approved")) {
+                //find current user
+                StudentProfessor currentUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
+                Account receiver = currentUser.getAccount();
+
+                //find changed amount
+                double amount = Double.parseDouble(payment.getTransactions().get(0).getAmount().getTotal());
+
+                //change credit
+                receiver.addValue(amount);
+
+                //save changes
+                accountRepository.save(receiver);
+
+                //for transfer entry find paypal corporate account
+                Corporate paypal = corporateRepository.findByName("Paypal Recharge").get();
+
+                //create transfer entry
+                MoneyTransfer transfer = new MoneyTransfer();
+                transfer.setAmount(amount);
+                transfer.setSender(paypal.getAccount());
+                transfer.setReceiver(receiver);
+                transfer.setDate(new Timestamp(System.currentTimeMillis()));
+
+                transferRepository.save(transfer);
+                return "redirect:/charge-success";
+            }
+        } catch (PayPalRESTException e) {
+            System.out.println(e.getMessage());
+        }
+        return "redirect:/charge-success";
+    }
+
+    @GetMapping("/charge-success")
+    public String successPay(HttpServletRequest request) {
+        getWeather(request);
+        return "/account/charge-successful";
+    }
+
+
 
     private List<MoneyTransfer> getAffiliatedTransactions(StudentProfessor user) {
         Optional<Account> accountOptional = accountRepository.findById(user.getAccount().getId());
