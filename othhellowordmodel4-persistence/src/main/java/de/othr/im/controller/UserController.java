@@ -124,12 +124,15 @@ public class UserController {
             studentProfessor.setAccount(new Account());
             studentProfessorRepository.save(studentProfessor);
 
+            user.setActive(1);
+            userRepository.save(user);
+            mv.setViewName("verwalten/accountVerified");
 
             mv.addObject("name", studentProfessor.getUser().getName());
             mv.addObject("email", studentProfessor.getUser().getEmail());
-            mv.setViewName("/verwalten/student-added");
+           // mv.setViewName("/verwalten/student-added");
 
-            this.emailSender(user);
+           // this.emailSender(user);
 
         } else {
             mv.setViewName("/error-email");
@@ -208,6 +211,7 @@ public class UserController {
     @RequestMapping(value = "/email-sender")
     private void emailSender(User user) {
 
+    	try {
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
         confirmationTokenRepository.save(confirmationToken);
 
@@ -218,6 +222,9 @@ public class UserController {
                 + "http://localhost:8080/user/confirm-account?token=" + confirmationToken.getConfirmationToken());
 
         javaMailSender.send(mailMessage);
+    	}catch (Exception e) {
+			
+		}
     }
 
     // Email senden nach löschen des Accounts

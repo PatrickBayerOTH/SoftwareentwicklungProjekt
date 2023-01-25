@@ -129,8 +129,10 @@ public class FriendsController {
 
 
 	        //model.addAttribute("students", studentRepository.findByNameContaining(friend.getName()));
-	        List<User> finds =  userRepository.findByNameContaining(friend.getName());
-	        List<User> findsNachname =  userRepository.findByNachnameContaining(friend.getNachname());
+	        List<User> finds =  userRepository.findAllByNameContaining(friend.getName());
+	        System.out.print(friend.getNachname());
+	        List<User> findsNachname =  userRepository.findAllByNachnameContaining(friend.getName());
+	        System.out.print(findsNachname);
 	        finds.addAll(findsNachname);
 	        model.addAttribute("students", finds);
 
