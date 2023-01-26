@@ -3,6 +3,9 @@ package de.othr.im.model;
 import java.io.Serializable;
 import javax.persistence.*;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 
 @Entity
 @Table(name = "studentProfessor")

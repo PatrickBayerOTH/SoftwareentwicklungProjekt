@@ -354,12 +354,16 @@ public class UserController {
             transferRepository.deleteBySender(account.get());
             transferRepository.deleteByReceiver(account.get());
 
-            studentProfessorRepository.delete(optStudent.get());
-            userRepository.delete(user.get());
+          
+            
+            
             accountRepository.delete(account.get());
+       
 
             if (confirmationToken.isPresent()) {
                 confirmationTokenRepository.delete(confirmationToken.get());
+                studentProfessorRepository.delete(optStudent.get());
+                userRepository.delete(user.get());
             }
             model.addAttribute("msgs", "Schade, dass du nicht mehr bei uns bist!");
             mv.setViewName("/verwalten/student-deleted");
