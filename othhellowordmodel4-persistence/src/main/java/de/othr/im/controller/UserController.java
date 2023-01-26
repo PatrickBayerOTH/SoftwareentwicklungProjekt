@@ -11,7 +11,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -23,10 +22,7 @@ import java.util.*;
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
-    FriendRepository friendRepository;
-    @Autowired
-    TransferRepository transferRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -51,6 +47,11 @@ public class UserController {
     @Autowired
     private ConfirmationTokenRepository confirmationTokenRepository;
 
+    @Autowired
+    FriendRepository friendRepository;
+    @Autowired
+    TransferRepository transferRepository;
+
     @RequestMapping(value = "/student/add", method = RequestMethod.GET)
     public ModelAndView addStudentForm() {
 
@@ -73,39 +74,54 @@ public class UserController {
 
         ModelAndView mv = new ModelAndView();
 
+        if (studentProfessor.getUser().getMatrikelnummer() == null) {
+            bindingResult.rejectValue("user.matrikelnummer", "error", "Matrikelnummer Ein Feld ist leer eingegeben.");
+            mv.setViewName("redirect:/user/student/add");
+            return mv;
+        }
+        if (studentProfessor.getUser().getEmail().isEmpty()) {
+            bindingResult.rejectValue("user.email", "error", "Email Feld ist leer eingegeben.");
+            mv.setViewName("redirect:/user/student/add");
+            return mv;
+        }
+
+        if (studentProfessor.getUser().getPassword().isEmpty()) {
+            bindingResult.rejectValue("user.password", "error", "Password Feld ist leer eingegeben.");
+            mv.setViewName("redirect:/user/student/add");
+            return mv;
+        }
+        if (studentProfessor.getUser().getNachname().isEmpty()) {
+            bindingResult.rejectValue("user.nachname", "error", "Nachname Feld ist leer eingegeben.");
+            mv.setViewName("redirect:/user/student/add");
+            return mv;
+        }
+        if (studentProfessor.getUser().getName().isEmpty()) {
+            bindingResult.rejectValue("user.name", "error", "Name Feld ist leer eingegeben.");
+            mv.setViewName("redirect:/user/student/add");
+            return mv;
+        }
+        if (studentProfessor.getUser().getType().isEmpty()) {
+            bindingResult.rejectValue("user.type", "error", "Type Feld ist leer eingegeben.");
+            mv.setViewName("redirect:/user/student/add");
+            return mv;
+        }
+
         if (bindingResult.hasErrors()) {
             mv.setViewName("/error-email");
             return mv;
         }
 
-        if (studentProfessor.getUser().getEmail().isEmpty() || studentProfessor.getUser().getType().isEmpty() || studentProfessor.getUser().getName().isEmpty()
-                || studentProfessor.getUser().getNachname().isEmpty() || studentProfessor.getUser().getPassword().isEmpty() || studentProfessor.getUser().getMatrikelnummer() == null) {
-
-            mv.setViewName("/verwalten/student-add");
-            mv.setViewName("redirect:/user/student/add");
-            return mv;
-        }
-
-        User user = studentProfessor.getUser();
-
         Optional<User> userDB = userRepository.findUserByEmail(studentProfessor.getUser().getEmail());
-        Optional<User> userDbToMtnr = userRepository.findUserMtnr(user.getMatrikelnummer());
 
 
         if (userDB.isPresent()) {
-            bindingResult.rejectValue("user.email", "error.user", "An account already exists for this login.");
             mv.setViewName("/error-email");
             return mv;
         }
-
-        if (userDbToMtnr.isPresent()) {
-            bindingResult.rejectValue("user.matrikelnummer", "error.user", "An account already exists for this login.");
-            mv.setViewName("/error-email");
-            return mv;
-        }
-
         String checkEmail = studentProfessor.getUser().getEmail();
         if (checkEmail.contains("@st.oth-regensburg.de")) {
+
+            User user = studentProfessor.getUser();
 
             List<Authority> myauthorities = new ArrayList<Authority>();
             myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
@@ -124,15 +140,12 @@ public class UserController {
             studentProfessor.setAccount(new Account());
             studentProfessorRepository.save(studentProfessor);
 
-            user.setActive(1);
-            userRepository.save(user);
-            mv.setViewName("verwalten/accountVerified");
 
             mv.addObject("name", studentProfessor.getUser().getName());
             mv.addObject("email", studentProfessor.getUser().getEmail());
-           // mv.setViewName("/verwalten/student-added");
+            mv.setViewName("/verwalten/student-added");
 
-           // this.emailSender(user);
+            this.emailSender(user);
 
         } else {
             mv.setViewName("/error-email");
@@ -211,7 +224,6 @@ public class UserController {
     @RequestMapping(value = "/email-sender")
     private void emailSender(User user) {
 
-    	try {
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
         confirmationTokenRepository.save(confirmationToken);
 
@@ -222,9 +234,6 @@ public class UserController {
                 + "http://localhost:8080/user/confirm-account?token=" + confirmationToken.getConfirmationToken());
 
         javaMailSender.send(mailMessage);
-    	}catch (Exception e) {
-			
-		}
     }
 
     // Email senden nach löschen des Accounts
@@ -293,7 +302,6 @@ public class UserController {
         String email = user.getEmail();
         Optional<Account> account = accountRepository.findById(user.getId());
 
-
         List<Authority> myauthorities = new ArrayList<Authority>();
         myauthorities.add(new Authority(Constants.AUTHORITY_STUDENT));
         user.setMyauthorities(myauthorities);
@@ -328,7 +336,6 @@ public class UserController {
         return mv;
     }
 
-    @Transactional
     @RequestMapping(value = "/delete/{id}")
     public ModelAndView delete(@PathVariable("id") Long id, Model model) {
 
@@ -354,11 +361,7 @@ public class UserController {
             }
             model.addAttribute("msgs", "Schade, dass du nicht mehr bei uns bist!");
             mv.setViewName("/verwalten/student-deleted");
-            try {
-                emailSenderByDeleteAccount(user.get());
-            } catch (Exception e) {
-                System.out.print("Email senden fehlgeschlagen");
-            }
+            emailSenderByDeleteAccount(user.get());
         } else {
             model.addAttribute("errors", "Event not found!");
             mv.setViewName("redirect:/home");
@@ -422,6 +425,7 @@ public class UserController {
 
     }
 
+
     @RequestMapping(method = RequestMethod.POST, value = "/matrikelNummer/process/{id}")
     public ModelAndView updateUserByMatrikelnummer(@ModelAttribute("neuMatrikelnummer") User getuser, @PathVariable("id") Long id, Authentication authentication) {
 
@@ -444,7 +448,6 @@ public class UserController {
             mv.setViewName("/error-email");
             return mv;
         }
-
         if (userByEmail.isPresent() && userById.isPresent()) {
 
             List<Authority> myauthorities = new ArrayList<Authority>();
@@ -464,8 +467,7 @@ public class UserController {
 
                 studentProfessorRepository.save(studentProfessor);
             }
-
-            if (responseMatrikelnummer == null || responseType.isEmpty()) {
+            if (responseMatrikelnummer == null && responseType.isEmpty()) {
                 mv.setViewName("redirect:/home");
                 return mv;
             }
