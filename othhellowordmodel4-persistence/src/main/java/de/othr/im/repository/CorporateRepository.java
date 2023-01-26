@@ -6,6 +6,10 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
+/*
+Repository holding information about corporate user accounts
+Written by Tobias Mooshofer
+ */
 public interface CorporateRepository extends JpaRepository<Corporate, Long> {
 
     Optional<Corporate> findById(Long id);

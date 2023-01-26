@@ -2,6 +2,11 @@ package de.othr.im.model;
 
 import javax.persistence.*;
 
+/*
+Table representing an corporate user account
+consists of an ID, a name and an associated account (the money holding type)
+Written by Tobias Mooshofer
+ */
 @Entity
 @Table(name = "corporate")
 public class Corporate {

@@ -26,6 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/*
+Controller that handles requests related to accounts
+Written by Tobias Mooshofer
+ */
 @Controller
 public class AccountController {
 
@@ -41,6 +45,10 @@ public class AccountController {
     CorporateRepository corporateRepository;
 
 
+    /*
+    Returns the main account page
+    The returned model contains data used to build the transaction table
+     */
     @RequestMapping("/account")
     public String account(Model model, HttpServletRequest request) {
         StudentProfessor user = (StudentProfessor) request.getSession().getAttribute("studentSession");
@@ -63,6 +71,14 @@ public class AccountController {
         return "/account/account";
     }
 
+    /*
+    Handles the creation of a new paypal order
+    Redirects to the Paypal site
+    and afterwards to /charge-failed or /charge-successfull
+    RequestBody needs to carry a PaypalOrder object defined by:
+    DOUBLE price
+    STRING description
+     */
     @PostMapping("/paypal")
     public String payment(@ModelAttribute("order") PaypalOrder order) {
         try {
@@ -82,12 +98,20 @@ public class AccountController {
         return "redirect:/";
     }
 
+    /*
+    Returns a confirmation page after the account recharge was canceled
+     */
     @GetMapping("/charge-failed")
     public String cancelPay(HttpServletRequest request) {
         getWeather(request);
         return "/account/charge-failed";
     }
 
+    /*
+    Handles the necessary changes, when a payment by paypal was successfully received
+    This function will change account values and create a transaction
+    redirects to /charge-success after all actions are completed
+     */
     @GetMapping("/charge-successfull")
     public String successfullPay(@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId, HttpServletRequest request) {
         try {
@@ -125,6 +149,9 @@ public class AccountController {
         return "redirect:/charge-success";
     }
 
+    /*
+    Returns a confirmation page after the account was successfully charged
+     */
     @GetMapping("/charge-success")
     public String successPay(HttpServletRequest request) {
         getWeather(request);
@@ -133,6 +160,10 @@ public class AccountController {
 
 
 
+    /*
+    Helper function that finds all Transactions in which user is sender or receiver
+    returns a list of transfers
+    */
     private List<MoneyTransfer> getAffiliatedTransactions(StudentProfessor user) {
         Optional<Account> accountOptional = accountRepository.findById(user.getAccount().getId());
         if(accountOptional.isEmpty()) {
@@ -146,6 +177,9 @@ public class AccountController {
         return transfers;
     }
 
+    /*
+    Helper function converting an account to the name of its owner
+     */
     private String convertName(Account account) {
         //check if account is student
         Optional<StudentProfessor> studentProfessor = studentProfessorRepository.findByAccount(account.getId());

@@ -5,6 +5,8 @@ import de.othr.im.model.*;
 import de.othr.im.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -13,6 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/*
+Outbound API Controller that allows:
+- retrieval and adjustments of account information
+- retrieval, creation and adjustments of corporate user accounts
+- creation of transfers TO corporations
+Written by Tobias Mooshofer
+ */
 @RestController
 @RequestMapping("/api")
 public class TransferController {
@@ -27,11 +36,21 @@ public class TransferController {
     @Autowired
     CorporateRepository corporateRepository;
 
+    @Autowired
+    private JavaMailSender javaMailSender;
+
+    /*
+    Creating an account without an associated corporation is currently not allowed
+     */
     @PostMapping("/account/{accountId}")
     public void createAccount(@PathVariable Long accountId, @RequestBody Account createAccount) {
         throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED);
     }
 
+    /*
+    Reads the information of the account defined by accountID
+    usefull to retrieve a customers current balance
+     */
     @GetMapping("/account/{accountId}")
     public Account readAccount(@PathVariable Long accountId) {
         Optional<Account> account = accountRepository.findById(accountId);
@@ -41,6 +60,11 @@ public class TransferController {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requested account does not exist");
     }
 
+    /*
+    Updates an account defined by accountId with an Account from the requestbody
+    usefull to apply refunds or change account values without creating a transaction
+    can currently brick the database, if the new accountID is not the one stated in the request
+    */
     @PutMapping("/account/{accountId}")
     public void updateAccount(@PathVariable Long accountId, @RequestBody Account updateAccount) {
         Optional<Account> account = accountRepository.findById(accountId);
@@ -54,6 +78,10 @@ public class TransferController {
         accountRepository.save(editAccount);
     }
 
+    /*
+    Deletes an account without deleting the associated user
+    will in most cases brick the database
+     */
     @DeleteMapping("/account/{accountId}")
     public void deleteAccount(@PathVariable Long accountId) {
         Optional<Account> account = accountRepository.findById(accountId);
@@ -63,6 +91,10 @@ public class TransferController {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requested account does not exist");
     }
 
+    /*
+    DTO class representing a corporate account
+    used to resolve the internally handled accountId to its value
+     */
     class CorporateOut {
         private long id;
         private String name;
@@ -101,16 +133,27 @@ public class TransferController {
         }
     }
 
+
+    /*
+    Creates a new corporation from the specified name
+    Returns a representation of the created corporation
+     */
     @PostMapping("/corp")
-    public void createCorporation(@RequestBody CorporateOut createCorporation) {
+    public CorporateOut createCorporation(@RequestBody String createCorporation) {
         Corporate corporate = new Corporate();
         //corporate.setId(createCorporation.getId());
-        corporate.setName(createCorporation.getName());
+        corporate.setName(createCorporation);
         Account account = new Account();
-        account.setValue(createCorporation.getValue());
+        account.setValue(0);
         corporate.setAccount(account);
         corporateRepository.save(corporate);
+        CorporateOut corporateOut = new CorporateOut(corporate.getId(), corporate.getName(), corporate.getAccount().getValue());
+        return corporateOut;
     }
+
+    /*
+    Returns the available information about the corporation specified by corporateID
+     */
     @GetMapping("/corp/{corporateId}")
     public CorporateOut readCorporation(@PathVariable Long corporateId) {
         Optional<Corporate> corporate = corporateRepository.findById(corporateId);
@@ -122,8 +165,12 @@ public class TransferController {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requested Corporation does not exist");
     }
 
+    /*
+    Applies the changes specified by the request body to the corporation specified by corporateId
+    Mirrors the updated corporation object back to the client
+     */
     @PutMapping("/corp/{corporateId}")
-    public void updateCorporation(@PathVariable Long corporateId, @RequestBody CorporateOut updateCorporation) {
+    public CorporateOut updateCorporation(@PathVariable Long corporateId, @RequestBody CorporateOut updateCorporation) {
         Optional<Corporate> corporate = corporateRepository.findById(corporateId);
         if(corporate.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requested Corporation does not exist");
@@ -134,19 +181,31 @@ public class TransferController {
         editcorporate.setName(updateCorporation.getName());
         editcorporate.getAccount().setValue(updateCorporation.getValue());
         corporateRepository.save(editcorporate);
+        return updateCorporation;
     }
 
+    /*
+    Removes the corporation defined by corporateID from the system
+    Returns a representation of the deleted corporation
+     */
     @DeleteMapping("/corp/{corporateId}")
-    public void deleteCorporation(@PathVariable Long corporateId) {
+    public CorporateOut deleteCorporation(@PathVariable Long corporateId) {
         Optional<Corporate> corporate = corporateRepository.findById(corporateId);
         if(corporate.isPresent()) {
+            Corporate toDelete = corporate.get();
+            CorporateOut corporateOut = new CorporateOut(toDelete.getId(), toDelete.getName(), toDelete.getAccount().getValue());
             Account account = corporate.get().getAccount();
             accountRepository.deleteById(account.getId());
             corporateRepository.deleteById(corporateId);
+            return corporateOut;
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requested Corporation does not exist");
     }
 
+    /*
+    DTO Class used to create a new transaction/transfer
+    Specifies an userId as sender, a corporateId as receiver and a value
+     */
     class TransferForm {
         private Long from;
         private Long to;
@@ -183,8 +242,12 @@ public class TransferController {
         }
     }
 
+    /*
+    Creates and executes the transfer transmitted in the request body
+    Returns a representation of the created transaction
+     */
    @PostMapping("/transfer")
-    public void createTransfer(@RequestBody TransferForm transferForm) {
+    public TransferReport createTransfer(@RequestBody TransferForm transferForm) {
         //get sender object
         Optional<StudentProfessor> studentProfessor = studentProfessorRepository.findStudentByIdUser(transferForm.getFrom());
         if (studentProfessor.isEmpty()) {
@@ -211,10 +274,31 @@ public class TransferController {
         transfer.setSender(senderAccount);
         transfer.setReceiver(receiverAccount);
         transfer.setDate(new Timestamp(System.currentTimeMillis()));
-
         transferRepository.save(transfer);
+        //send mail to the user
+        try {
+           SimpleMailMessage msgAddFriend = new SimpleMailMessage();
+           msgAddFriend.setTo(sender.getUser().getEmail());
+           msgAddFriend.setSubject("UniPays INFO: Sie haben einen Einkauf getätigt!");
+           String msg = "Sehr geehrte/r " + sender.getUser().getName() + " " + sender.getUser().getNachname() + " \n";
+           msg += "Ihr konto wurde gerade von " + receiver.getName() + " mit einem Betrag von " + transfer.getAmount() + "€ belastet.\n";
+           msg += "Ihr verbleibender Kontostand: " + senderAccount.getValue() + "€";
+           msgAddFriend.setText(msg);
+           javaMailSender.send(msgAddFriend);
+        }catch (Exception e) {
+           System.out.print("Email senden fehlgeschlagen");
+        }
+
+        //create return object
+       Actor senderActor = new Actor(senderAccount.getId(), convertName(senderAccount));
+       Actor receiverActor = new Actor(receiverAccount.getId(), convertName(receiverAccount));
+       TransferReport transferReport = new TransferReport(senderActor, receiverActor, transfer.getAmount(), transfer.getDate());
+       return transferReport;
     }
 
+    /*
+    Returns a representation of all transactions associated with the specified corporateId
+     */
     @GetMapping("/transfer/{corporateId}")
     public TransferList getTransfers(@PathVariable Long corporateId) {
         Optional<Corporate> corporate = corporateRepository.findById(corporateId);
@@ -236,6 +320,9 @@ public class TransferController {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requested Corporation does not exist");
     }
 
+    /*
+    DTO Class representing a list of transactionReports
+     */
     class TransferList {
         long corporation_id;
         String corporation_name;
@@ -272,6 +359,9 @@ public class TransferController {
         }
     }
 
+    /*
+    DTO Class representing a single recorded transaction
+     */
     class TransferReport {
 
         Actor sender;
@@ -320,6 +410,10 @@ public class TransferController {
         }
     }
 
+    /*
+    DTO Class representing a transactions actor
+    Name and AccountID representation of either a corporation or an user
+     */
     class Actor {
         long account_id;
         String name;
@@ -346,6 +440,10 @@ public class TransferController {
         }
     }
 
+    /*
+    Helper function that finds all Transactions in which user is sender or receiver
+    returns a list of transfers
+     */
     private List<MoneyTransfer> getAffiliatedTransactions(Corporate user) {
         Optional<Account> accountOptional = accountRepository.findById(user.getAccount().getId());
         if(accountOptional.isEmpty()) {
@@ -359,6 +457,9 @@ public class TransferController {
         return transfers;
     }
 
+    /*
+    Helper function converting an account to the name of its owner
+     */
     private String convertName(Account account) {
         //check if account is student
         Optional<StudentProfessor> studentProfessor = studentProfessorRepository.findByAccount(account.getId());

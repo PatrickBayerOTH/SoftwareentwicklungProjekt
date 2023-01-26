@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
 
+/*
+Service used to communicate with the paypal api
+Written by Tobias Mooshofer
+ */
 @Service
 public class PaypalService {
 
@@ -20,6 +24,10 @@ public class PaypalService {
     private APIContext apiContext;
 
 
+    /*
+    Creates a new payment object
+    A payment object is a representation of all needed parameters to open a new order via the paypal api
+     */
     public Payment createPayment(
             Double total,
             String currency,
@@ -33,7 +41,6 @@ public class PaypalService {
         total = new BigDecimal(total).setScale(2, RoundingMode.HALF_UP).doubleValue();
 
         amount.setTotal(String.format(Locale.ROOT, "%.2f", total));
-        System.out.println(amount.getTotal());
         Transaction transaction = new Transaction();
         transaction.setDescription(description);
         transaction.setAmount(amount);
@@ -56,6 +63,9 @@ public class PaypalService {
         return payment.create(apiContext);
     }
 
+    /*
+    Sends an order request to the paypal UI for execution
+     */
     public Payment executePayment(String paymentId, String payerId) throws PayPalRESTException{
         Payment payment = new Payment();
         payment.setId(paymentId);

@@ -6,6 +6,14 @@ import javax.persistence.*;
 
 import de.othr.im.util.AttributeEncryptor;
 
+/*
+Table holding information about transfers
+Transfers are represented by:
+- a sending and a receiving account
+- a value
+- a timestamp
+Written by Patrick Bayer & Tobias Mooshofer
+ */
 @Entity
 @Table(name="transfer")
 public class MoneyTransfer{// implements Serializable{
