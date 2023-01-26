@@ -16,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 @Controller
@@ -336,6 +337,7 @@ public class UserController {
         return mv;
     }
 
+    @Transactional
     @RequestMapping(value = "/delete/{id}")
     public ModelAndView delete(@PathVariable("id") Long id, Model model) {
 
