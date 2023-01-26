@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import de.othr.im.model.*;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 //import de.othr.im.model.Student;
 
 public interface TransferRepository extends JpaRepository<MoneyTransfer, Account> {
@@ -16,8 +17,12 @@ public interface TransferRepository extends JpaRepository<MoneyTransfer, Account
 
 	@Query("select t from MoneyTransfer t where t.receiver.id=:receiver")
 	List<MoneyTransfer> findByReceiver(Long receiver);
-	
+
+
+	@Transactional
 	void  deleteBySender(Account account);
+
+	@Transactional
 	void deleteByReceiver(Account account);
 
 	
