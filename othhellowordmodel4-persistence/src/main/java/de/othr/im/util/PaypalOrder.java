@@ -25,13 +25,13 @@ public class PaypalOrder {
     Constructor
     only needs a price and a description as input
     App specific statics:
-    currency = EUR, method = PAYPAL, intent = ORDER
+    currency = EUR, method = PAYPAL, intent = SALE
      */
     public PaypalOrder(double price, String description) {
         this.price = price;
         this.currency = "EUR";
         this.method = "PAYPAL";
-        this.intent = "ORDER";
+        this.intent = "SALE";
         this.description = description;
     }
 

@@ -39,11 +39,6 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="http://localhost:8080/activity">
-                            <spring:message code="navbar.activities"></spring:message>
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="http://localhost:8080/friends">
                             <spring:message code="navbar.friends"></spring:message>
                         </a>

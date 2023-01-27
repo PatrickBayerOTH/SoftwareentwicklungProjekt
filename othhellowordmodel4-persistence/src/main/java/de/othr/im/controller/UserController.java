@@ -140,7 +140,7 @@ public class UserController {
             return mv;
         }
         String checkEmail = studentProfessor.getUser().getEmail();
-        if (checkEmail.contains("@st.oth-regensburg.de")) {
+        if (checkEmail.contains("@st.oth-regensburg.de") || checkEmail.contains("@oth-regensburg.de")) {
 
             User user = studentProfessor.getUser();
 
