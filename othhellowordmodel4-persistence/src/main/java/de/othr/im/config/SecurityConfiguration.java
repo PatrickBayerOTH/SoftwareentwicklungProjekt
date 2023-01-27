@@ -84,6 +84,10 @@ public class SecurityConfiguration {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    
+    /*Abdallah Alsoudi 
+    * Password verschlüsseln
+    *  */
     @Bean
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();

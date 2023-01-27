@@ -37,19 +37,13 @@ import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class HomeController {
-
-
-    @Autowired
-    private JavaMailSender javaMailSender;
-
-
+    
     @Autowired
     UserRepository userRepository;
 
     @Autowired
     ManagerRepository managerRepository;
-
-
+    
     @Autowired
     StudentProfessorRepository studentProfessorRepository;
 
@@ -63,8 +57,14 @@ public class HomeController {
 
     @Autowired
     CorporateRepository corporateRepository;
-
-
+    
+    
+    /* Abdallah Alsoudi 
+    gleich Prinzip von der Home Methode aus der Vorlesung mit spezifischen Anpassungen
+    * Wenn STUDENT exisitert dann meldet sich einfach an.
+    * Beim Google anmelden, Wenn Studierenden/ Professorinnen noch keine Matrikelnummer hinterlegt haben, dann Anmeldung ist nicht möglich
+    * wenn schon die Matrikelnummer übeinstimmt dann ist eine Anmeldung möglich
+    */
     @RequestMapping(value = {"/home", "/"})
     public ModelAndView home(HttpServletRequest request, Principal principal, Authentication authentication) {
 

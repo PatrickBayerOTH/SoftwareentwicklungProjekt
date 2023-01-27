@@ -4,15 +4,20 @@ import java.util.Optional;
 
 import de.othr.im.config.MyUserDetails;
 import de.othr.im.model.User;
-import de.othr.im.model.oauthUser.CustomOAuth2User;
 import de.othr.im.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+
+/*Abdallah Alsoudi
+* hilft bei der Anmeldung
+* von Spring Security Struktur
+* Anmeldung von Username. in unserem Fall bei Email.
+* fast gleich wie in der Übung aber andere möglichkeiten und Fälle
+* */
 @Service
 public class MyUserDetailService implements UserDetailsService {
 

@@ -6,6 +6,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import java.util.Collection;
 import java.util.Map;
 
+/* Abdallah Alsoudi
+* Klasse für Google-Account Anmeldung
+* */
 public class CustomOAuth2User implements OAuth2User {
 
     private OAuth2User oauth2User;

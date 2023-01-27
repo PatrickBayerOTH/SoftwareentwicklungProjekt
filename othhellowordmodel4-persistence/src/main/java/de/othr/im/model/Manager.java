@@ -4,6 +4,11 @@ import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
+
+/* Abdallah Alsoudi
+Entity, Tabelle. dient zum Speichern der spezifischen Daten von Manager beim Registrieren
+ * die ist mit User Tabelle über Fremdschlüßel verbunden
+ *  */
 @Entity
 @Table(name = "manager")
 public class Manager {

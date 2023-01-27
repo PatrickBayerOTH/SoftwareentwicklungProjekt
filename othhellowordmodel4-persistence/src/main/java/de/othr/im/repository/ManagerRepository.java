@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 
+/* Abdallah Alsoudi
+ * Repository zum Abholen der Daten anhand des Fremdschlüssels und andere Attribute mit ID
+ * */
 @Repository
 public interface ManagerRepository extends JpaRepository<Manager, Long> {
 

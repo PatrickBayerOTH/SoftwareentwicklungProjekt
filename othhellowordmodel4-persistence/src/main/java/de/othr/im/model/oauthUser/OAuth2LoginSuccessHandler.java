@@ -19,6 +19,16 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+
+/* Abdallah Alsoudi
+*
+* Diese Klasse ist auch für Google-Account Anmeldung
+* Die Daten von Google werden hier behandelt
+* Split Methode wird der Name und Nachname beim Fall von Fehlern von Namen in Google trenne und in der Db anpassen
+* Danach wenn Account existiert, dann die Methode in UserController wird aufgerufen und die daten aktualisieren oder gleich bleiben
+* existiert der User noch nicht, dann wird ein Account angelegt
+*
+* */
 @Component
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 

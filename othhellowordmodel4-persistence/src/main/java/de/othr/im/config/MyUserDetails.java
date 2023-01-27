@@ -26,9 +26,7 @@ public class MyUserDetails implements UserDetails {
 
         this.email = user.getEmail();
         this.password = user.getPassword();
-
         this.active = (user.getActive() > 0) ? true : false;
-
 
         List<Authority> myauthorities = (List<Authority>) user.getMyauthorities();
 

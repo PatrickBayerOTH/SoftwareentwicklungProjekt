@@ -6,6 +6,11 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+
+/* Abdallah Alsoudi
+* Diese Klasse ist eine hilfe Klasse für Google-Acount Registrieren 
+* in verbunde mit CustomOAuth2User Konstruktor, dass die kommenden Daten eingeschrieben werden
+* */
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 

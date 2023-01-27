@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/* Abdallah Alsoudi
+Entity, Tabelle. dient zum Speichern der Daten von User beim Registrieren
+* */
 @Entity
 @Table(name = "user")
 public class User {

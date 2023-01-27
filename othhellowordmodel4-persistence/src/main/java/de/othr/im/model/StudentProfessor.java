@@ -7,6 +7,10 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 
+/* Abdallah Alsoudi
+Entity, Tabelle. dient zum Speichern der spezifischen Daten von Studenten/Professoren beim Registrieren
+ * die ist mit User oder andere Tabelle über Fremdschlüßel verbunden
+ *  */
 @Entity
 @Table(name = "studentProfessor")
 public class StudentProfessor implements Serializable {

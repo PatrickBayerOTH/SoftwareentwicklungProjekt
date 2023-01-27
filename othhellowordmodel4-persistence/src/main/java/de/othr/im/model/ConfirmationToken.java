@@ -6,6 +6,12 @@ import java.util.UUID;
 
 import javax.persistence.*;
 
+
+/*Abdallah Alsoudi
+* Entity und Tabelle für Token
+* hier wird ein Random Token erstell, um die Verifizierung zu bestätigen
+* diese Klasse ist auch verbunden mit User Klasse über Fremdschlüssel
+* */
 @Entity
 @Table(name = "confirmationToken")
 public class ConfirmationToken implements Serializable {
