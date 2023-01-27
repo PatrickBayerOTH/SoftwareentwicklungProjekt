@@ -201,11 +201,9 @@ public class AccountController {
 
         RestTemplate rT = new RestTemplate();
         String result = rT.getForObject(uri, String.class);
-        // System.out.print(result);
         JSONObject jo = new JSONObject(result);
         JSONObject wetObj = jo.getJSONArray("weather").getJSONObject(0);
         String wet = wetObj.getString("main");
-        //System.out.println(wet);
         switch (wet) {
             case "Clouds":
                 wet="http://openweathermap.org/img/wn/02d@2x.png";

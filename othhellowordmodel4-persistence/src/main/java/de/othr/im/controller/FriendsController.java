@@ -92,7 +92,6 @@ public class FriendsController {
 	public String friends(Model model, HttpServletRequest request) {
 
 		StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
-		System.out.println(curUser.getAccount().getValue());
 
 		List<Friend> currFriends = friendRepository.findByuserId(Long.valueOf(curUser.getUser().getId()));
 		if (currFriends.isEmpty()) {
@@ -139,7 +138,6 @@ public class FriendsController {
 		List<User> findsNachname = userRepository.findAllByNachnameContaining(friend.getName());
 		List<User> listNachnameCopy = new ArrayList<>(findsNachname);
 		listNachnameCopy.removeAll(finds);
-		System.out.printf("CurUserID: %d", curUser.getId());
 		finds.addAll(listNachnameCopy);
 		finds.removeIf(u -> u.getId() == curUser.getId());
 
@@ -192,7 +190,6 @@ public class FriendsController {
 				&& id != curUser.getUser().getId()) {
 
 			Optional<StudentProfessor> friend = studentProfessorRepository.findStudentByIdUser(id);// studentProfessorRepository.findById(id);
-			System.out.println(id);
 			List<Friend> friends = friendRepository.findByuserId(curUser.getUser().getId());
 			if (friends.isEmpty()) {
 				friends = friendRepository.findByfriendId(Long.valueOf(curUser.getUser().getId()));
@@ -215,7 +212,6 @@ public class FriendsController {
 			try {
 				SimpleMailMessage msgAddFriend = new SimpleMailMessage();
 				msgAddFriend.setTo(curUser.getUser().getEmail());
-				System.out.println(friend.get().getUser().getName());
 				msgAddFriend.setSubject("UniPays INFO: Sie haben einen Freund hinzugefügt");
 				msgAddFriend.setText("Sie haben " + friend.get().getUser().getNachname() + " "
 						+ friend.get().getUser().getName() + "als Freund hinzugefügt");
@@ -321,8 +317,6 @@ public class FriendsController {
 		model.addAttribute("receiver", receiver);
 
 		attributes.addAttribute("transactions", transactions);
-
-		System.out.println(transfer.getAmount());
 
 		double oldKonto = 0;
 		if (studentProfessorRepository.findById(Long.valueOf(currentUser.getId())).isPresent()) {

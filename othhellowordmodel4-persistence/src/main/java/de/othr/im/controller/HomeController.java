@@ -141,7 +141,6 @@ public class HomeController {
 		JSONObject jo = new JSONObject(result);
 		JSONObject wetObj = jo.getJSONArray("weather").getJSONObject(0);
 		String wet = wetObj.getString("main");
-		//System.out.println(wet);
 		switch (wet) {
 		case "Clouds":
 			wet="http://openweathermap.org/img/wn/02d@2x.png";
