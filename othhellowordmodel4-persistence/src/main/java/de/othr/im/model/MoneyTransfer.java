@@ -11,32 +11,41 @@ import de.othr.im.util.AttributeEncryptor;
 Table holding information about transfers
 Transfers are represented by:
 - a sending and a receiving account
-- a value
+- a value for the amount sent 
 - a timestamp
+- a message sent with the transfer encrypted and decrypted by AttributeEncryptor
+
 Written by Patrick Bayer & Tobias Mooshofer
  */
 @Entity
-@Table(name="transfer")
-public class MoneyTransfer{// implements Serializable{
-	
+@Table(name = "transfer")
+public class MoneyTransfer {// implements Serializable{
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue (strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
-
-
+	// Sending account
 	@OneToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "sender", referencedColumnName = "id")
 	private Account sender;
+	// Receiving account
 	@OneToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "receiver", referencedColumnName = "id")
 	private Account receiver;
-	
+	//Amount of the transaction 
+	double amount;
+	//Date and time of the transaction
+	Timestamp date;
+	//Message sent with the transaction
+	@Convert(converter = AttributeEncryptor.class)
+	String message;
+
 	public String getMessage() {
 		return message;
 	}
@@ -44,13 +53,6 @@ public class MoneyTransfer{// implements Serializable{
 	public void setMessage(String message) {
 		this.message = message;
 	}
-
-	double amount;
-	Timestamp date;
-	@Convert(converter = AttributeEncryptor.class)
-	String message; 
-
-
 
 	public Account getSender() {
 		return sender;
@@ -72,19 +74,16 @@ public class MoneyTransfer{// implements Serializable{
 		return amount;
 	}
 
-	public void setAmount( double amount) {
-		this.amount=amount;
+	public void setAmount(double amount) {
+		this.amount = amount;
 	}
-	
+
 	public Timestamp getDate() {
 		return date;
 	}
 
-	public void setDate( Timestamp date) {
-		this.date=date;
+	public void setDate(Timestamp date) {
+		this.date = date;
 	}
-	
-	
-
 
 }

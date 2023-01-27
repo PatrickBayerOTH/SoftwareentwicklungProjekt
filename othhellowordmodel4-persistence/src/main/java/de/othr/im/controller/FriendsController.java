@@ -1,6 +1,7 @@
 package de.othr.im.controller;
 
 import java.sql.Timestamp;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,572 +41,538 @@ import de.othr.im.repository.ManagerRepository;
 import de.othr.im.repository.StudentProfessorRepository;
 import de.othr.im.repository.TransferRepository;
 import de.othr.im.repository.UserRepository;
+
+/*
+Controller that handles requests related to Friends
+- Searching friends in user database
+- Adding a user as a friend
+- Removing a user as a friend
+- Sending money to a friend
+- Email communication related to friends like money sent notification
+
+ 
+Written by Patrick Bayer
+ */
+
 @Controller
 public class FriendsController {
+
+	@Autowired
+	private JavaMailSender javaMailSender;
+
+	@Autowired
+	HistoricFriendTransferRepository hFRepository;
+
+	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
+	ManagerRepository managerRepository;
+
+	@Autowired
+	StudentProfessorRepository studentProfessorRepository;
+
+	@Autowired
+	FriendRepository friendRepository;
+	@Autowired
+	TransferRepository transferRepository;
+
+	@Autowired
+	AccountRepository accountRepository;
+
+	@Autowired
+	CorporateRepository corporateRepository;
+
 	
+	/*
+    Returns the main friend page
+    Shows all friends if any exist
+     */
+	@RequestMapping("/friends")
+	public String friends(Model model, HttpServletRequest request) {
 
-    @Autowired
-    private JavaMailSender javaMailSender;
+		StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
+		System.out.println(curUser.getAccount().getValue());
 
+		List<Friend> currFriends = friendRepository.findByuserId(Long.valueOf(curUser.getUser().getId()));
+		if (currFriends.isEmpty()) {
+			currFriends = friendRepository.findByfriendId(Long.valueOf(curUser.getUser().getId()));
+		}
+
+		List<User> studFriends = new ArrayList<User>();
+		{
+		}
+
+		for (Friend f : currFriends) {
+
+			Optional<User> studF = userRepository.findById(f.getFriendId());
+
+			User actStud = new User();
+			if (studF.isPresent()) {
+
+				actStud = studF.get();
+			}
+
+			studFriends.add(actStud);
+
+		}
+
+		model.addAttribute("currfriends", currFriends);
+		model.addAttribute("studfriends", studFriends);
+		return "/friends";
+	}
+
+	
+	/*
+    Returns the search page for searching for friend in user db
+    The returned model contains the letters or names the user want to search for
+    Show all results and all existing friends
+     */
+	@RequestMapping(value = "/selectFriend")
+	public String searchFriend(@ModelAttribute(name = "friendForm") User friend, Model model,
+			HttpServletRequest request) {
+
+		StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
+
+		List<User> finds = userRepository.findAllByNameContaining(friend.getName());
+
+		List<User> findsNachname = userRepository.findAllByNachnameContaining(friend.getName());
+		List<User> listNachnameCopy = new ArrayList<>(findsNachname);
+		listNachnameCopy.removeAll(finds);
+		System.out.printf("CurUserID: %d", curUser.getId());
+		finds.addAll(listNachnameCopy);
+		finds.removeIf(u -> u.getId() == curUser.getId());
+
+		model.addAttribute("students", finds);
+
+		List<Friend> friends = friendRepository.findByuserId(Long.valueOf(curUser.getUser().getId()));
+
+		if (friends.isEmpty()) {
+			friends = friendRepository.findByfriendId(Long.valueOf(curUser.getUser().getId()));
+		}
+
+		List<User> studFriends = new ArrayList<User>();
+		{
+		}
+		;
+		for (Friend f : friends) {
+
+			Optional<User> studF = userRepository.findById(f.getFriendId());
+
+			User actStud = new User();
+			if (studF.isPresent()) {
+
+				actStud = studF.get();
+			}
+
+			studFriends.add(actStud);
+
+		}
+
+		getWeather(request);
+		model.addAttribute("friends", friends);
+		model.addAttribute("studfriends", studFriends);
+
+		return "/friendSearch";
+	}
+
+	/*
+    After clicking a result in the search page the new friends will be added.
+    Returns search page with updated existing friends.
+    A confirmation mail gets send to the user.
     
-    @Autowired
-    HistoricFriendTransferRepository hFRepository;
+     */
+	@RequestMapping(value = "/addFriend/{id}")
+	public ModelAndView addFriend(@PathVariable("id") Long id, Model model, HttpServletRequest request,
+			RedirectAttributes attributes) {
 
-    @Autowired
-    UserRepository userRepository;
+		StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
 
-    @Autowired
-    ManagerRepository managerRepository;
+		if (friendRepository.findByuserIdAndFriendId(curUser.getUser().getId(), id) == null
+				&& id != curUser.getUser().getId()) {
 
+			Optional<StudentProfessor> friend = studentProfessorRepository.findStudentByIdUser(id);// studentProfessorRepository.findById(id);
+			System.out.println(id);
+			List<Friend> friends = friendRepository.findByuserId(curUser.getUser().getId());
+			if (friends.isEmpty()) {
+				friends = friendRepository.findByfriendId(Long.valueOf(curUser.getUser().getId()));
+			}
 
-    @Autowired
-    StudentProfessorRepository studentProfessorRepository;
+			model.addAttribute("friends", friends);
 
-    @Autowired
-    FriendRepository friendRepository;
-    @Autowired
-    TransferRepository transferRepository;
+			Friend newFriend = new Friend();
+			newFriend.setUserId(Long.valueOf(curUser.getUser().getId()));
+			newFriend.setFriendId(id);
 
-    @Autowired
-    AccountRepository accountRepository;
+			friendRepository.save(newFriend);
 
-    @Autowired
-    CorporateRepository corporateRepository;
+			Friend newFriendReverse = new Friend();
+			newFriendReverse.setFriendId(Long.valueOf(curUser.getUser().getId()));
+			newFriendReverse.setUserId(id);
 
-	  @RequestMapping("/friends")
+			friendRepository.save(newFriendReverse);
 
-	    public String friends(Model model, HttpServletRequest request) {
+			try {
+				SimpleMailMessage msgAddFriend = new SimpleMailMessage();
+				msgAddFriend.setTo(curUser.getUser().getEmail());
+				System.out.println(friend.get().getUser().getName());
+				msgAddFriend.setSubject("UniPays INFO: Sie haben einen Freund hinzugefügt");
+				msgAddFriend.setText("Sie haben " + friend.get().getUser().getNachname() + " "
+						+ friend.get().getUser().getName() + "als Freund hinzugefügt");
 
+				javaMailSender.send(msgAddFriend);
+			} catch (Exception e) {
+				System.out.print("Email senden fehlgeschlagen");
+			}
 
-	        //Current User
-	        StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
-	        System.out.println(curUser.getAccount().getValue());
+			String msg = "Erfolgreich";
+			attributes.addFlashAttribute("success", msg);
 
-	        List<Friend> currFriends = friendRepository.findByuserId(Long.valueOf(curUser.getUser().getId()));//1
-	        if (currFriends.isEmpty()) {
-	            currFriends = friendRepository.findByfriendId(Long.valueOf(curUser.getUser().getId()));
-	        }
-	        //List<Student> studFriends = new ArrayList<Student>();
-	        List<User> studFriends = new ArrayList<User>();
-	        {
-	        }
+			return new ModelAndView("redirect:/selectFriend");
+		} else {
 
-	        for (Friend f : currFriends) {
+			String msg = "Bereits vorhanden";
+			attributes.addFlashAttribute("success", msg);
 
-	            //Optional<Student> studF = studentRepository.findById(f.getFriendId());
-	            Optional<User> studF = userRepository.findById(f.getFriendId());
+			return new ModelAndView("redirect:/selectFriend");
+		}
 
-	            //Student actStud = new Student();
-	            User actStud = new User();
-	            if (studF.isPresent()) {
-	                // value is present inside Optional
-	                actStud = studF.get();
-	            }
+	}
+	
+	/*
+    When clicked on the remove button of a friend the friendship will be deleted.
+    Returns the search page with updated existing friends
+    A confirmation mail gets send to the user.
+     */
 
-	            studFriends.add(actStud);
+	@Transactional
+	@RequestMapping(value = "/removeFriend/{id}")
+	public ModelAndView removeFriend(@PathVariable("id") Long id, Model model, HttpServletRequest request,
+			RedirectAttributes attributes) {
 
-	        }
-	       /* for (Student s : studFriends) {
-	            System.out.print(s.getName());
+		StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
 
-	        }*/
+		long deletedFriends = friendRepository.deleteByuserIdAndFriendId(Long.valueOf(curUser.getUser().getId()), id);
 
-	       /*  for (StudentProfessor s : studFriends) {
-	             System.out.print(s.getUser().getName());
+		long deletedFriendsS = friendRepository.deleteByFriendIdAndUserId(Long.valueOf(curUser.getUser().getId()), id);
 
-	         }
-	        */
+		Optional<StudentProfessor> friend = studentProfessorRepository.findStudentByIdUser(id);
+		try {
+			SimpleMailMessage msgRemoveFriend = new SimpleMailMessage();
+			msgRemoveFriend.setTo(curUser.getUser().getEmail());
 
+			msgRemoveFriend.setSubject("UniPays INFO: Sie haben einen Freund entfernt");
+			msgRemoveFriend.setText("Sie haben " + friend.get().getUser().getNachname() + " "
+					+ friend.get().getUser().getNachname() + "als Freund entfernt");
 
-	        model.addAttribute("currfriends", currFriends);
-	        model.addAttribute("studfriends", studFriends);
-	        return "/friends";
-	    }
+			javaMailSender.send(msgRemoveFriend);
+		} catch (Exception e) {
+			System.out.print("Email senden fehlgeschlagen");
+		}
 
-	    @RequestMapping(value = "/selectFriend")
-	    public String searchFriend(@ModelAttribute(name = "friendForm") User friend, Model model, HttpServletRequest request) {
+		String msg = "Freund entfernt";
+		attributes.addFlashAttribute("deleted", msg);
 
-	        StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
+		return new ModelAndView("redirect:/selectFriend");
+	}
 
-	        //model.addAttribute("students", studentRepository.findByNameContaining(friend.getName()));
-	        List<User> finds =  userRepository.findAllByNameContaining(friend.getName());
-	       
-	        List<User> findsNachname =  userRepository.findAllByNachnameContaining(friend.getName());
-	        List<User> listNachnameCopy = new ArrayList<>(findsNachname);
-	        listNachnameCopy.removeAll(finds);
-	        System.out.printf("CurUserID: %d", curUser.getId());
-	        finds.addAll(listNachnameCopy);
-	        finds.removeIf(u -> u.getId()==curUser.getId());
-	       
-	        model.addAttribute("students", finds);
+	/*
+    When clicked on the sendMoney button of a friend the user sends money to the user corresponding to the id
+    Returns the sendMoney view with updated transfer history
+    The model attribute transfer contains amount and message of the transfer
+    A confirmation mail gets send to the user and the receiving user.
+     */
+	@RequestMapping(value = "/sendMoney/{id}")
+	public ModelAndView sendMoney(@ModelAttribute(name = "sendForm") MoneyTransfer transfer,
+			@PathVariable("id") Long id, Model model, BindingResult result, HttpServletRequest request,
+			RedirectAttributes attributes) {
 
-	        List<Friend> friends = friendRepository.findByuserId(Long.valueOf(curUser.getUser().getId()));
+		StudentProfessor currentUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
 
-	        if (friends.isEmpty()) {
-	            friends = friendRepository.findByfriendId(Long.valueOf(curUser.getUser().getId()));
-	        }
+		List<HistoricFriendTransfer> transactions = hFRepository.findBysenderId(currentUser.getUser().getId()); // Out
+		List<HistoricFriendTransfer> transactionsIn = hFRepository.findByreceiverId(currentUser.getUser().getId());
+		transactions.addAll(transactionsIn);
 
-	        //List<Student> studFriends = new ArrayList<Student>();
-	        List<User> studFriends = new ArrayList<User>();
-	        {
-	        }
-	        ;
-	        for (Friend f : friends) {
+		List<String> sender = new ArrayList<>(), receiver = new ArrayList<>(), date = new ArrayList<>();
+		for (HistoricFriendTransfer m : transactions) {
 
-	            //Optional<Student> studF = studentRepository.findById(f.getFriendId());
-	            Optional<User> studF = userRepository.findById(f.getFriendId());
-	            //Student actStud = new Student();
-	            User actStud = new User();
-	            if (studF.isPresent()) {
-	                // value is present inside Optional
-	                actStud = studF.get();
-	            }
+			sender.add(m.getSender());
 
-	            studFriends.add(actStud);
+			receiver.add(m.getReceiver());
+			date.add(I18nFunctions.localizeDate(m.getDate(), LocaleContextHolder.getLocale()));
+		}
+		List<Integer> directions = new ArrayList<Integer>();
+		for (HistoricFriendTransfer m : transactions) {
+			if (m.getSenderid() == currentUser.getAccount().getId()) {
 
-	        }
+				directions.add(1);
 
-	        getWeather(request);
-	        model.addAttribute("friends", friends);
-	        model.addAttribute("studfriends", studFriends);
+			} else {
+				directions.add(0);
 
-	        return "/friendSearch";
-	    }
+			}
 
-	    @RequestMapping(value = "/addFriend/{id}")
-	    public ModelAndView addFriend(@PathVariable("id") Long id, Model model, HttpServletRequest request,
-	                                  RedirectAttributes attributes) {
+		}
+		model.addAttribute("directions", directions);
+		getWeather(request);
+		model.addAttribute("date", date);
+		model.addAttribute("transactions", transactions);
+		model.addAttribute("sender", sender);
+		model.addAttribute("receiver", receiver);
 
-	        StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
+		attributes.addAttribute("transactions", transactions);
 
-	        if (friendRepository.findByuserIdAndFriendId(curUser.getUser().getId(), id) == null && id != curUser.getUser().getId()) {
+		System.out.println(transfer.getAmount());
 
-	            //Optional<Student> friend = studentRepository.findById(id);
+		double oldKonto = 0;
+		if (studentProfessorRepository.findById(Long.valueOf(currentUser.getId())).isPresent()) {
 
-	            Optional<StudentProfessor> friend = studentProfessorRepository.findStudentByIdUser(id);//studentProfessorRepository.findById(id);
-	            System.out.println(id);
-	            List<Friend> friends = friendRepository.findByuserId(curUser.getUser().getId());
-	            if (friends.isEmpty()) {
-	                friends = friendRepository.findByfriendId(Long.valueOf(curUser.getUser().getId()));
-	            }
+			double availableAmount = currentUser.getAccount().getValue();
+			oldKonto = availableAmount;
+			model.addAttribute("kontostand", availableAmount);
+			if (availableAmount >= transfer.getAmount() && transfer.getAmount() > 0) {
+				System.out.print("Updated Kontostand");
+				System.out.print(transfer.getAmount());
+				System.out.print("+");
+				System.out.print(availableAmount);
 
-	            model.addAttribute("friends", friends);
-	            // System.out.println(friends.get(0).getFriendId());
-	            // System.out.println(friends.get(1).getFriendId());
-	            // System.out.println(friend.get().getName());
-	            Friend newFriend = new Friend();
-	            newFriend.setUserId(Long.valueOf(curUser.getUser().getId()));
-	            newFriend.setFriendId(id);
-	            // System.out.print(newFriend.getFriendId());
-	            friendRepository.save(newFriend);
+				currentUser.getAccount().setValue(oldKonto - transfer.getAmount());
+				Optional<StudentProfessor> optTargetStudent = studentProfessorRepository.findStudentByIdUser(id);
+				transfer.setSender(currentUser.getAccount());
 
+				StudentProfessor targetStudent = optTargetStudent.get();
+				double oldKOntoTarget = targetStudent.getAccount().getValue();
+				targetStudent.getAccount().setValue(oldKOntoTarget + transfer.getAmount());
+				transfer.setReceiver(targetStudent.getAccount());
+				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+				transfer.setDate(timestamp);
 
-	            Friend newFriendReverse = new Friend();
-	            newFriendReverse.setFriendId(Long.valueOf(curUser.getUser().getId()));
-	            newFriendReverse.setUserId(id);
-	            // System.out.print(newFriend.getFriendId());
-	            friendRepository.save(newFriendReverse);
+				HistoricFriendTransfer newhFTransfer = new HistoricFriendTransfer();
+				long senderid = Long.valueOf(currentUser.getUser().getId());
+				newhFTransfer.setSenderid(senderid);
+				long receiverid = Long.valueOf(targetStudent.getUser().getId());
+				newhFTransfer.setReceiverid(receiverid);
+				newhFTransfer.setSender(currentUser.getUser().getName() + " " + currentUser.getUser().getNachname());
+				newhFTransfer
+						.setReceiver(targetStudent.getUser().getName() + " " + targetStudent.getUser().getNachname());
+				newhFTransfer.setAmount(transfer.getAmount());
+				newhFTransfer.setMessage(transfer.getMessage());
+				newhFTransfer.setDate(timestamp);
 
-	            try {
-	            SimpleMailMessage msgAddFriend = new SimpleMailMessage();
-	            msgAddFriend.setTo(curUser.getUser().getEmail());
-	             System.out.println(friend.get().getUser().getName());
-	            msgAddFriend.setSubject("UniPays INFO: Sie haben einen Freund hinzugefügt");
-	            msgAddFriend.setText("Sie haben " + friend.get().getUser().getNachname() + " " + friend.get().getUser().getNachname() + "als Freund hinzugefügt");
+				hFRepository.save(newhFTransfer);
+				transferRepository.save(transfer);
+				studentProfessorRepository.save(targetStudent);
+				studentProfessorRepository.save(currentUser);
 
-	            javaMailSender.send(msgAddFriend);
-	            }catch (Exception e) {
-	            	System.out.print("Email senden fehlgeschlagen");
+				try {
+					SimpleMailMessage msgSend = new SimpleMailMessage();
+					msgSend.setTo(currentUser.getUser().getEmail());
+
+					msgSend.setSubject("UniPays INFO: Sie haben Geld gesendet");
+					msgSend.setText(
+							"Sie haben " + transfer.getAmount() + " Euro an " + targetStudent.getUser().getNachname()
+									+ " " + targetStudent.getUser().getName() + "gesendet");
+
+					javaMailSender.send(msgSend);
+
+					SimpleMailMessage msgRecieved = new SimpleMailMessage();
+					msgRecieved.setTo(targetStudent.getUser().getEmail());
+
+					msgRecieved.setSubject("UniPays INFO: Sie haben Geld empfangen");
+					msgRecieved.setText(
+							"Sie haben " + transfer.getAmount() + " Euro von " + currentUser.getUser().getNachname()
+									+ " " + currentUser.getUser().getName() + "empfangen");
+
+					javaMailSender.send(msgRecieved);
+				} catch (Exception e) {
+					System.out.print("Email senden fehlgeschlagen");
 				}
 
+				if (oldKonto != currentUser.getAccount().getValue()) {
+					return new ModelAndView("redirect:/sendMoney");
+				}
 
-	            String msg = "Erfolgreich";
-	            attributes.addFlashAttribute("success", msg);
-	            // model.addAttribute("success",msg);
-	            return new ModelAndView("redirect:/selectFriend");
-	        } else {
-
-	            String msg = "Bereits vorhanden";
-	            attributes.addFlashAttribute("success", msg);
-	            // System.out.print("Bereits vorhanden");
-	            return new ModelAndView("redirect:/selectFriend");
-	        }
-
-	    }
-
-	    @Transactional
-	    @RequestMapping(value = "/removeFriend/{id}")
-	    public ModelAndView removeFriend(@PathVariable("id") Long id, Model model, HttpServletRequest request,
-	                                     RedirectAttributes attributes) {
-
-
-	        StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
-
-	        //sendEmail();
-
-	        long deletedFriends = friendRepository.deleteByuserIdAndFriendId(Long.valueOf(curUser.getUser().getId()), id);
-
-	        long deletedFriendsS = friendRepository.deleteByFriendIdAndUserId(Long.valueOf(curUser.getUser().getId()), id);
-
-	        Optional<StudentProfessor> friend = studentProfessorRepository.findStudentByIdUser(id);
-	        try {
-	        SimpleMailMessage msgRemoveFriend = new SimpleMailMessage();
-	        msgRemoveFriend.setTo(curUser.getUser().getEmail());
-	        // System.out.println(friend.get().getUser().getName());
-	        msgRemoveFriend.setSubject("UniPays INFO: Sie haben einen Freund entfernt");
-	        msgRemoveFriend.setText("Sie haben " + friend.get().getUser().getNachname() + " " + friend.get().getUser().getNachname() + "als Freund entfernt");
-
-	        javaMailSender.send(msgRemoveFriend);
-	        }catch (Exception e) {
-	        	System.out.print("Email senden fehlgeschlagen");
 			}
 
-	        String msg = "Freund entfernt";
-	        attributes.addFlashAttribute("deleted", msg);
-
-	        return new ModelAndView("redirect:/selectFriend");
-	    }
-
-	    @RequestMapping(value = "/sendMoney/{id}")
-	    public ModelAndView sendMoney(@ModelAttribute(name = "sendForm") MoneyTransfer transfer,
-	                                  @PathVariable("id") Long id, Model model, BindingResult result, HttpServletRequest request,
-	                                  RedirectAttributes attributes) {
-	        // model.addAttribute("transfer", transfer);
-
-
-	        StudentProfessor currentUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
-	        //List<MoneyTransfer> transactions = getAffiliatedTransactions(currentUser);
-	        List<HistoricFriendTransfer> transactions = hFRepository.findBysenderId(currentUser.getUser().getId()); //Out
-	        List<HistoricFriendTransfer> transactionsIn = hFRepository.findByreceiverId(currentUser.getUser().getId());
-	        transactions.addAll(transactionsIn);
-	        
-	        List<String> sender = new ArrayList<>(), receiver = new ArrayList<>(), date = new ArrayList<>();
-	        for(HistoricFriendTransfer m : transactions) {
-	            //sender.add(convertName(m.getSender()));
-	        	sender.add(m.getSender());
-	            //receiver.add(convertName(m.getReceiver()));
-	        	receiver.add(m.getReceiver());
-				date.add(I18nFunctions.localizeDate(m.getDate(), LocaleContextHolder.getLocale()));
-	        }
-	        List<Integer> directions = new ArrayList<Integer>();
-	        for (HistoricFriendTransfer m : transactions) {
-	        	if(m.getSenderid() == currentUser.getAccount().getId()) {
-	        		//System.out.printf("Sender:%s Current User:%s",m.getSender().getId(),currentUser.getAccount().getId());
-	        		directions.add(1);
-	        		
-	        	}else {
-	        		directions.add(0);
-	        		
-	        	}
-	        	
-	        }
-	        model.addAttribute("directions", directions);
-	        getWeather(request);
-			model.addAttribute("date", date);
-	        model.addAttribute("transactions", transactions);
-	        model.addAttribute("sender", sender);
-	        model.addAttribute("receiver", receiver);
-
-	        attributes.addAttribute("transactions", transactions);
-
-
-	        System.out.println(transfer.getAmount());
-	        //StudentProfessor currentUser = new StudentProfessor();
-	        //Optional<StudentProfessor> optStudent = studentProfessorRepository.findById(Long.valueOf(currentUser.getUser().getId()));
-	        double oldKonto = 0;
-	        if (studentProfessorRepository.findById(Long.valueOf(currentUser.getId())).isPresent()) {
-	            //currentUser = optStudent.get();
-	            double availableAmount = currentUser.getAccount().getValue();
-	            oldKonto = availableAmount;
-	            model.addAttribute("kontostand", availableAmount);
-	            if (availableAmount >= transfer.getAmount() && transfer.getAmount() > 0) {
-	                System.out.print("Updated Kontostand");
-	                System.out.print(transfer.getAmount());
-	                System.out.print("+");
-	                System.out.print(availableAmount);
-
-	                currentUser.getAccount().setValue(oldKonto - transfer.getAmount());
-	                Optional<StudentProfessor> optTargetStudent = studentProfessorRepository.findStudentByIdUser(id);
-	                transfer.setSender(currentUser.getAccount());
-
-	                StudentProfessor targetStudent = optTargetStudent.get();
-	                double oldKOntoTarget = targetStudent.getAccount().getValue();
-	                targetStudent.getAccount().setValue(oldKOntoTarget + transfer.getAmount());
-	                transfer.setReceiver(targetStudent.getAccount());
-	                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-	                transfer.setDate(timestamp);
-	                
-	                HistoricFriendTransfer newhFTransfer = new HistoricFriendTransfer();
-	                long senderid= Long.valueOf(currentUser.getUser().getId());
-	                newhFTransfer.setSenderid(senderid);
-	                long receiverid= Long.valueOf(targetStudent.getUser().getId());
-	                newhFTransfer.setReceiverid(receiverid);
-	                newhFTransfer.setSender(currentUser.getUser().getName()+" " + currentUser.getUser().getNachname());
-	                newhFTransfer.setReceiver(targetStudent.getUser().getName()+" " + targetStudent.getUser().getNachname());
-	                newhFTransfer.setAmount(transfer.getAmount());
-	                newhFTransfer.setMessage(transfer.getMessage());
-	                newhFTransfer.setDate(timestamp);
-	               
-	                
-	               
-	                
-	                hFRepository.save(newhFTransfer);
-	                transferRepository.save(transfer);
-	                studentProfessorRepository.save(targetStudent);
-	                studentProfessorRepository.save(currentUser);
-
-	                try {
-	                SimpleMailMessage msgSend = new SimpleMailMessage();
-	                msgSend.setTo(currentUser.getUser().getEmail());
-	                // System.out.println(friend.get().getUser().getName());
-	                msgSend.setSubject("UniPays INFO: Sie haben Geld gesendet");
-	                msgSend.setText("Sie haben " + transfer.getAmount() + " Euro an " + targetStudent.getUser().getNachname() + " " + targetStudent.getUser().getNachname() + "gesendet");
-
-	                javaMailSender.send(msgSend);
-
-	                SimpleMailMessage msgRecieved = new SimpleMailMessage();
-	                msgRecieved.setTo(targetStudent.getUser().getEmail());
-	                // System.out.println(friend.get().getUser().getName());
-	                msgRecieved.setSubject("UniPays INFO: Sie haben Geld empfangen");
-	                msgRecieved.setText("Sie haben " + transfer.getAmount() + " Euro von " + currentUser.getUser().getNachname() + " " + currentUser.getUser().getNachname() + "empfangen");
-
-	                javaMailSender.send(msgRecieved);
-	                }catch (Exception e) {
-						System.out.print("Email senden fehlgeschlagen");
-					}
-
-
-	                if (oldKonto != currentUser.getAccount().getValue()) {
-	                    return new ModelAndView("redirect:/sendMoney");
-	                }
-
-	            }
-
-	        } else {
-	            System.out.println("Not found");
-	        }
-
-	        List<Friend> currFriends = friendRepository.findByuserId(Long.valueOf(currentUser.getUser().getId()));
-
-	        List<User> studFriends = new ArrayList<User>();
-	        {
-	        }
-	        ;
-	        for (Friend f : currFriends) {
-	            Optional<User> studF = userRepository.findById(f.getFriendId());
-	            User actStud = new User();
-	            if (studF.isPresent()) {
-	                // value is present inside Optional
-	                actStud = studF.get();
-	            }
-
-	            studFriends.add(actStud);
-
-	        }
-
-	        model.addAttribute("currfriends", currFriends);
-	        model.addAttribute("studfriends", studFriends);
-
-	        String msg = "targetfriend";
-
-	        model.addAttribute("targetfriend", msg);
-
-	        return new ModelAndView("/sendToFriend");
-	    }
-
-	    @RequestMapping(value = "/sendMoney")
-	    public ModelAndView sendMoneywoF(Model model, HttpServletRequest request, RedirectAttributes attributes) {
-	        StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
-	        List<HistoricFriendTransfer> transactions = hFRepository.findBysenderId(curUser.getUser().getId()); //Out
-	        List<HistoricFriendTransfer> transactionsIn = hFRepository.findByreceiverId(curUser.getUser().getId());
-	        transactions.addAll(transactionsIn);
-	        List<String> sender = new ArrayList<>(), receiver = new ArrayList<>(), date = new ArrayList<>();
-	        for(HistoricFriendTransfer m : transactions) {
-	        	//sender.add(convertName(m.getSender()));
-	        	sender.add(m.getSender());
-	            //receiver.add(convertName(m.getReceiver()));
-	        	receiver.add(m.getReceiver());
-				date.add(I18nFunctions.localizeDate(m.getDate(), LocaleContextHolder.getLocale()));
-	        }
-			model.addAttribute("date", date);
-	        model.addAttribute("transactions", transactions);
-	        model.addAttribute("sender", sender);
-	        model.addAttribute("receiver", receiver);
-//	        List<MoneyTransfer> transactions = transferRepository.findByFrom(curUser.getAccount().getId();
-//	        System.out.print(transactions);
-	        List<Integer> directions = new ArrayList<Integer>();
-	        for (HistoricFriendTransfer m : transactions) {
-	        	if(m.getSenderid() == curUser.getAccount().getId()) {
-	        		//System.out.printf("Sender:%s Current User:%s",m.getSender().getId(),currentUser.getAccount().getId());
-	        		directions.add(1);
-	        		
-	        	}else {
-	        		directions.add(0);
-	        		
-	        	}
-	        	
-	        }
-	        model.addAttribute("directions", directions);
-//	        List<User> recStuds = new ArrayList<User>();
-//	        for (MoneyTransfer m : transactions) {
-	//
-//	            directions.add(1);
-	//
-//	            Optional<User> recStud = userRepository.findById(Long.valueOf(m.getTo()));
-//	            User actStud = new User();
-//	            if (recStud.isPresent()) {
-//	                // value is present inside Optional
-//	                actStud = recStud.get();
-//	            }
-	//
-//	            recStuds.add(actStud);
-	//
-//	        }
-//	        model.addAttribute("directions", directions);
-//	        model.addAttribute("transactions", transactions);
-//	        model.addAttribute("recStuds", recStuds);
-//	        attributes.addAttribute("transactions", transactions);
-	//
-	//
-//	        List<MoneyTransfer> transactionsRecieved = transferRepository.findByTo(Math.toIntExact(curUser.getUser().getId()));
-	//
-//	        for (MoneyTransfer m : transactionsRecieved) {
-	//
-//	            directions.add(0);
-	//
-//	            Optional<User> recStud = userRepository.findById(Long.valueOf(m.getFrom()));
-//	            User actStud = new User();
-//	            if (recStud.isPresent()) {
-//	                // value is present inside Optional
-//	                actStud = recStud.get();
-//	            }
-	//
-//	            recStuds.add(actStud);
-	//
-//	        }
-//	        transactions.addAll(transactionsRecieved);
-//	        model.addAttribute("directions", directions);
-//	        model.addAttribute("transactions", transactions);
-//	        model.addAttribute("recStuds", recStuds);
-//	        attributes.addAttribute("transactions", transactions);
-
-
-	        List<Friend> currFriends = friendRepository.findByuserId(Long.valueOf(curUser.getUser().getId()));
-	        // System.out.print("No Friend recieved");
-	        List<User> studFriends = new ArrayList<User>();
-	        {
-	        }
-	        ;
-	        for (Friend f : currFriends) {
-	            Optional<User> studF = userRepository.findById(f.getFriendId());
-	            User actStud = new User();
-	            if (studF.isPresent()) {
-	                // value is present inside Optional
-	                actStud = studF.get();
-	            }
-
-	            studFriends.add(actStud);
-
-	        }
-	        // for (Student s : studFriends) {
-	        // System.out.print(s.getName());
-
-	        // }
-
-	        // System.out.print(currFriends);
-
-	        // System.out.print(currFriends);
-	        model.addAttribute("currfriends", currFriends);
-	        model.addAttribute("studfriends", studFriends);
-	        String msg = "notargetfriend";
-	        // attributes.addFlashAttribute("targetfriend", msg);
-	        model.addAttribute("targetfriend", msg);
-	        return new ModelAndView("/sendToFriend");
-	    }
-
-
-	    private List<MoneyTransfer> getAffiliatedTransactions(StudentProfessor user) {
-	        //get the account related to the user
-	        Optional<Account> accountOptional = accountRepository.findById(user.getAccount().getId());
-	        if(accountOptional.isEmpty()) {
-	            return null;
-	        }
-	        Account account = accountOptional.get();
-	        //get inbound Transactions
-	        List<MoneyTransfer> transfers = transferRepository.findByReceiver(account.getId());
-	        //get outbound Transactions
-	        transfers.addAll(transferRepository.findBySender(account.getId()));
-	        return transfers;
-	    }
-
-	    private String convertName(Account account) {
-	        //check if account is student
-	        Optional<StudentProfessor> studentProfessor = studentProfessorRepository.findByAccount(account.getId());
-	        if(studentProfessor.isPresent()) {
-	            String out =  studentProfessor.get().getUser().getName() + " " + studentProfessor.get().getUser().getNachname();
-	            return out;
-	        }
-	        Optional<Corporate> corporate = corporateRepository.findByAccount(account.getId());
-	        if(corporate.isPresent()) {
-	            return corporate.get().getName();
-	        }
-	        return "";
-	    }
-
-
-	    @GetMapping("/mainpage")
-		public String mainpage(Model model, HttpServletRequest request) {
-		  getWeather(request);
-		  return "mainpage";
+		} else {
+			System.out.println("Not found");
 		}
-	    
-	    public void getWeather(HttpServletRequest request) {
-	    	String key = "d4d77f62e03de4155aeda1baf768bd49";
-			String city = "Regensburg";
-			String uri = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&APPID=" + key;
 
-			RestTemplate rT = new RestTemplate();
-			String result = rT.getForObject(uri, String.class);
-			// System.out.print(result);
-			JSONObject jo = new JSONObject(result);
-			JSONObject wetObj = jo.getJSONArray("weather").getJSONObject(0);
-			String wet = wetObj.getString("main");
-			//System.out.println(wet);
-			switch (wet) {
-			case "Clouds":
-				wet="http://openweathermap.org/img/wn/02d@2x.png";
-				break;
-			case "Thunderstorm":
-				wet="http://openweathermap.org/img/wn/11d@2x.png";
-				break;
-			case "Drizzle":
-				wet="http://openweathermap.org/img/wn/09d@2x.png";
-				break;
-			case "Rain":
-					wet="http://openweathermap.org/img/wn/10d@2x.png";
-				break;
-			case "Snow":
-				wet="http://openweathermap.org/img/wn/13d@2x.png";
-				break;
-			case "Clear":
-				wet="http://openweathermap.org/img/wn/01d@2x.png";
-				break;
+		List<Friend> currFriends = friendRepository.findByuserId(Long.valueOf(currentUser.getUser().getId()));
 
-			default:
-				break;
+		List<User> studFriends = new ArrayList<User>();
+		{
+		}
+		;
+		for (Friend f : currFriends) {
+			Optional<User> studF = userRepository.findById(f.getFriendId());
+			User actStud = new User();
+			if (studF.isPresent()) {
+
+				actStud = studF.get();
 			}
-			request.getSession().setAttribute("wet", wet);
-			double temp = jo.getJSONObject("main").getDouble("temp") - 273.15;
-			double rf = jo.getJSONObject("main").getDouble("feels_like") - 273.15;
-			String tempS = I18nFunctions.localizeTemperature(temp, LocaleContextHolder.getLocale());
-			//String tempS = String.format("%.2f", temp);
-			String rfS = I18nFunctions.localizeTemperature(rf, LocaleContextHolder.getLocale());
-			//String rfS = String.format("%.2f", rf);
-			request.getSession().setAttribute("temp", tempS);
-			request.getSession().setAttribute("rf", rfS);
-	    	
-	    	
-	    }
 
-	
+			studFriends.add(actStud);
+
+		}
+
+		model.addAttribute("currfriends", currFriends);
+		model.addAttribute("studfriends", studFriends);
+
+		String msg = "targetfriend";
+
+		model.addAttribute("targetfriend", msg);
+
+		return new ModelAndView("/sendToFriend");
+	}
+
+	/*
+    
+    Returns a view with the historic transfers and friends to choose from to send money
+    
+     */
+	@RequestMapping(value = "/sendMoney")
+	public ModelAndView sendMoneywoF(Model model, HttpServletRequest request, RedirectAttributes attributes) {
+		StudentProfessor curUser = (StudentProfessor) request.getSession().getAttribute("studentSession");
+		List<HistoricFriendTransfer> transactions = hFRepository.findBysenderId(curUser.getUser().getId()); // Out
+		List<HistoricFriendTransfer> transactionsIn = hFRepository.findByreceiverId(curUser.getUser().getId());
+		transactions.addAll(transactionsIn);
+		List<String> sender = new ArrayList<>(), receiver = new ArrayList<>(), date = new ArrayList<>();
+		for (HistoricFriendTransfer m : transactions) {
+
+			sender.add(m.getSender());
+
+			receiver.add(m.getReceiver());
+			date.add(I18nFunctions.localizeDate(m.getDate(), LocaleContextHolder.getLocale()));
+		}
+		model.addAttribute("date", date);
+		model.addAttribute("transactions", transactions);
+		model.addAttribute("sender", sender);
+		model.addAttribute("receiver", receiver);
+
+		List<Integer> directions = new ArrayList<Integer>();
+		for (HistoricFriendTransfer m : transactions) {
+			if (m.getSenderid() == curUser.getAccount().getId()) {
+
+				directions.add(1);
+
+			} else {
+				directions.add(0);
+
+			}
+
+		}
+		model.addAttribute("directions", directions);
+
+		List<Friend> currFriends = friendRepository.findByuserId(Long.valueOf(curUser.getUser().getId()));
+
+		List<User> studFriends = new ArrayList<User>();
+		{
+		}
+		;
+		for (Friend f : currFriends) {
+			Optional<User> studF = userRepository.findById(f.getFriendId());
+			User actStud = new User();
+			if (studF.isPresent()) {
+
+				actStud = studF.get();
+			}
+
+			studFriends.add(actStud);
+
+		}
+
+		model.addAttribute("currfriends", currFriends);
+		model.addAttribute("studfriends", studFriends);
+		String msg = "notargetfriend";
+
+		model.addAttribute("targetfriend", msg);
+		return new ModelAndView("/sendToFriend");
+	}
+
+	private List<MoneyTransfer> getAffiliatedTransactions(StudentProfessor user) {
+
+		Optional<Account> accountOptional = accountRepository.findById(user.getAccount().getId());
+		if (accountOptional.isEmpty()) {
+			return null;
+		}
+		Account account = accountOptional.get();
+
+		List<MoneyTransfer> transfers = transferRepository.findByReceiver(account.getId());
+
+		transfers.addAll(transferRepository.findBySender(account.getId()));
+		return transfers;
+	}
+
+	private String convertName(Account account) {
+
+		Optional<StudentProfessor> studentProfessor = studentProfessorRepository.findByAccount(account.getId());
+		if (studentProfessor.isPresent()) {
+			String out = studentProfessor.get().getUser().getName() + " "
+					+ studentProfessor.get().getUser().getNachname();
+			return out;
+		}
+		Optional<Corporate> corporate = corporateRepository.findByAccount(account.getId());
+		if (corporate.isPresent()) {
+			return corporate.get().getName();
+		}
+		return "";
+	}
+
+	@GetMapping("/mainpage")
+	public String mainpage(Model model, HttpServletRequest request) {
+		getWeather(request);
+		return "mainpage";
+	}
+
+	/*
+   Function which gets the current weather in Regensburg from OpenWeather API.
+     */
+	public void getWeather(HttpServletRequest request) {
+		String key = "d4d77f62e03de4155aeda1baf768bd49";
+		String city = "Regensburg";
+		String uri = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&APPID=" + key;
+
+		RestTemplate rT = new RestTemplate();
+		String result = rT.getForObject(uri, String.class);
+
+		JSONObject jo = new JSONObject(result);
+		JSONObject wetObj = jo.getJSONArray("weather").getJSONObject(0);
+		String wet = wetObj.getString("main");
+
+		switch (wet) {
+		case "Clouds":
+			wet = "http://openweathermap.org/img/wn/02d@2x.png";
+			break;
+		case "Thunderstorm":
+			wet = "http://openweathermap.org/img/wn/11d@2x.png";
+			break;
+		case "Drizzle":
+			wet = "http://openweathermap.org/img/wn/09d@2x.png";
+			break;
+		case "Rain":
+			wet = "http://openweathermap.org/img/wn/10d@2x.png";
+			break;
+		case "Snow":
+			wet = "http://openweathermap.org/img/wn/13d@2x.png";
+			break;
+		case "Clear":
+			wet = "http://openweathermap.org/img/wn/01d@2x.png";
+			break;
+
+		default:
+			break;
+		}
+		request.getSession().setAttribute("wet", wet);
+		double temp = jo.getJSONObject("main").getDouble("temp") - 273.15;
+		double rf = jo.getJSONObject("main").getDouble("feels_like") - 273.15;
+		String tempS = I18nFunctions.localizeTemperature(temp, LocaleContextHolder.getLocale());
+
+		String rfS = I18nFunctions.localizeTemperature(rf, LocaleContextHolder.getLocale());
+
+		request.getSession().setAttribute("temp", tempS);
+		request.getSession().setAttribute("rf", rfS);
+
+	}
+
 }

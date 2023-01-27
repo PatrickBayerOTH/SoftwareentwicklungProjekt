@@ -9,11 +9,21 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.persistence.AttributeConverter;
+import javax.persistence.Convert;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+
+/*
+AttributeEncryptor which encrypt when writing in database and decrypt when reading encrypted values from database.
+Encrypts with "@Convert(converter = AttributeEncryptor.class)" marked columns e.g. in MoneyTransfer.java
+
+Written by Patrick Bayer
+ */
+
 
 @Component
 public class AttributeEncryptor implements AttributeConverter<String, String> {

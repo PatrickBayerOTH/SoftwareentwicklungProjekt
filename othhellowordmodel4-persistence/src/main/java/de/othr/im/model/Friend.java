@@ -9,7 +9,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-//Patrick Bayer Class for Friend entity
+/*
+Table holding information about friendship relations
+Friendships are represented by:
+- a user id(initiated the friendship) and id of the user added
+
+Written by Patrick Bayer
+ */
 
 
 @Entity

@@ -6,7 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import de.othr.im.model.Friend;
 import org.springframework.transaction.annotation.Transactional;
-//import de.othr.im.model.Student;
+
+/*
+Repository holding friendship information
+Written by Patrick Bayer
+ */
 
 public interface FriendRepository extends JpaRepository<Friend, Long> {
 	

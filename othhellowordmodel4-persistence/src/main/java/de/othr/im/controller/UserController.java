@@ -347,7 +347,7 @@ public class UserController {
         Optional<Account> account = accountRepository.findById(id);
 
         if (userRepository.existsById(id)) {
-        	//Patrick Bayer deleting friends and transfers of the user who deletes his accounts
+        	//Deleting friends and transfers of the user who deletes his accounts Patrick Bayer
             long deletedFriends = friendRepository.deleteByuserId(Long.valueOf(id));
             long deletedFriendsS = friendRepository.deleteByFriendId(Long.valueOf(id));
             transferRepository.deleteBySender(account.get());

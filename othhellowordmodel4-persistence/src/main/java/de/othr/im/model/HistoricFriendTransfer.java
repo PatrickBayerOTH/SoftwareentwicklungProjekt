@@ -17,9 +17,18 @@ import javax.persistence.Table;
 
 import de.othr.im.util.AttributeEncryptor;
 
-//Patrick Bayer Class for saving transfers even when one user deletes his account and 
- //therefore information about the  receiver would be not accessible anymore 
 
+/*
+Table holding information about transfers even when one user deletes his account and 
+therefore information about the  receiver would be not accessible anymore 
+Transfers are represented by:
+- a sending and a receiving id
+- Names of sender and receiver in the form firstname + lastname
+- a value for the amount sent
+- a timestamp
+- a message sent with the transfer encrypted and decrypted by AttributeEncryptor
+Written by Patrick Bayer
+ */
 
 @Entity
 @Table(name = "histtransfer")
