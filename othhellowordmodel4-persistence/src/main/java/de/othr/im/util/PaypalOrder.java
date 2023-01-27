@@ -1,13 +1,32 @@
 package de.othr.im.util;
 
+/*
+DTO Class representing an Order sent to paypal
+Written by Tobias Mooshofer
+ */
 public class PaypalOrder {
 
+    //the "total" of the order
     private double price;
+
+    //the currency ISO code
     private String currency;
+
+    //CREDIT or PAYPAL
     private String method;
+
+    //SALE, AUTHORIZE or ORDER
     private String intent;
+
+    //the orders' items
     private String description;
 
+    /*
+    Constructor
+    only needs a price and a description as input
+    App specific statics:
+    currency = EUR, method = PAYPAL, intent = ORDER
+     */
     public PaypalOrder(double price, String description) {
         this.price = price;
         this.currency = "EUR";

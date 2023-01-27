@@ -3,6 +3,11 @@ package de.othr.im.model;
 
 import javax.persistence.*;
 
+/*
+Table representing an account
+consists of an ID and the current amount of money (value) the account holds
+Written by Tobias Mooshofer
+ */
 @Entity
 @Table(name = "account")
 public class Account {

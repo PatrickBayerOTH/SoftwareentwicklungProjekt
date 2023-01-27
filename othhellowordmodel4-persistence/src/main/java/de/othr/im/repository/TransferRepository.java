@@ -8,8 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import de.othr.im.model.*;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
-//import de.othr.im.model.Student;
 
+/*
+Repository holding information about transfers
+Written by Patrick Bayer & Tobias Mooshofer
+ */
 public interface TransferRepository extends JpaRepository<MoneyTransfer, Account> {
 
 	@Query("select t from MoneyTransfer t where t.sender.id=:sender")
